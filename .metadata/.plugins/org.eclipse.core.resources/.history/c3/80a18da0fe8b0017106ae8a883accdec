@@ -1,0 +1,15 @@
+
+public class Main {
+
+	public static void main(String[] args) {
+		System.out.println("Hello, SmartHouse!");
+		/* This is the central manager.
+		 * Two broadcast sockets will be necessary.
+		 * One for sending packages to all devices to be discovered
+		 * one for receiving packages from these devices
+		 */
+		
+		
+	}
+
+}
