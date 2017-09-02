@@ -14,9 +14,21 @@ public class Main {
 		int opt = scan.nextInt();
 		scan.close();
 		switch (opt) {
-			case 1: System.out.println("Sender"); break;
-			case 2: System.out.println("Receiver"); break;
-			default: System.out.println("Invalid input"); break;
+			case 1: 
+				System.out.println("Sender");
+				BroadcastSenderSocket sender = new BroadcastSenderSocket();
+				String messageStr = "Test"; 
+				byte[] messageByte = messageStr.getBytes();
+				sender.sendData(messageByte);
+				break;
+			case 2:
+				System.out.println("Receiver");
+				BroadcastReceiverSocket receiver = new BroadcastReceiverSocket();
+				receiver.receiveData(-1);
+				break;
+			default: 
+				System.out.println("Invalid input");
+				break;
 		}
 		
 	}
