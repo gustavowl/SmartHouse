@@ -7,8 +7,13 @@ public class BroadcastReceiverSocket {
 	DatagramSocket socket = null;
 	
 	BroadcastReceiverSocket() {
+		this(12112);
+	}
+	
+	BroadcastReceiverSocket(int port) {
+		//TODO: verify if port range is valid
 		try {
-			socket = new DatagramSocket(12112, InetAddress.getByName("0.0.0.0"));
+			socket = new DatagramSocket(port, InetAddress.getByName("0.0.0.0"));
 			socket.setBroadcast(true);
 			
 		}
@@ -26,8 +31,9 @@ public class BroadcastReceiverSocket {
 				socket.receive(packet);
 				
 		        //Packet received
-				System.out.println(getClass().getName() + ">>>Discovery packet received from: " + packet.getAddress().getHostAddress());
-				System.out.println(getClass().getName() + ">>>Packet received; data: " + new String(packet.getData()));
+				System.out.println("-------------------------");
+				System.out.println(getClass().getName() + "Packet received from: " + packet.getAddress().getHostAddress());
+				System.out.println(getClass().getName() + "Data: " + new String(packet.getData()));
 				
 				if (packetsMax > 0) {
 					packetsMax--;

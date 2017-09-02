@@ -8,8 +8,13 @@ public class BroadcastSenderSocket {
 	DatagramSocket socket = null;
 	
 	BroadcastSenderSocket() {
+		this(12113);
+	}
+	
+	BroadcastSenderSocket(int port) {
+		//TODO: verify if port range is valid
 		try {
-			socket = new DatagramSocket(12112, InetAddress.getByName("0.0.0.0"));
+			socket = new DatagramSocket(port, InetAddress.getByName("0.0.0.0"));
 			socket.setBroadcast(true);
 			
 		}
