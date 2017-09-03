@@ -6,4 +6,4 @@
 - [x] See Java socket example: https://docs.oracle.com/javase/tutorial/networking/sockets/examples/EchoClient.java
 - [x] See Java socket example: https://docs.oracle.com/javase/tutorial/networking/datagrams/broadcasting.html
 - [x] See Java socket example: https://michieldemey.be/blog/network-discovery-using-udp-broadcast/
-- [ ] Test Java socket example: https://michieldemey.be/blog/network-discovery-using-udp-broadcast/
+- [x] Test Java socket example: https://michieldemey.be/blog/network-discovery-using-udp-broadcast/
