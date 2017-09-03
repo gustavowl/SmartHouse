@@ -26,8 +26,8 @@ public class Main {
 				 * 5 - Print current devices
 				 */
 				
-				BroadcastSenderSocket sender = new BroadcastSenderSocket();
-				BroadcastReceiverSocket receiver = new BroadcastReceiverSocket();
+				SenderSocket sender = new SenderSocket();
+				ReceiverSocket receiver = new ReceiverSocket();
 
 				//STEP 1				
 				byte[] messageByte = "DISCVR_IOT".getBytes();
@@ -68,11 +68,11 @@ public class Main {
 				 */
 				
 				//STEP 1
-				BroadcastReceiverSocket discoverableSocket = new BroadcastReceiverSocket();
+				ReceiverSocket discoverableSocket = new ReceiverSocket();
 				discoverableSocket.receiveData(1, "DISCVR_IOT");
 				
 				//STEP 2
-				sender = new BroadcastSenderSocket();
+				sender = new SenderSocket();
 				String messageStr = "CANICON_ID"; 
 				messageByte = messageStr.getBytes();
 				for (int attempts = 0; attempts <= 5; attempts++) {

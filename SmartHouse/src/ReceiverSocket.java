@@ -4,18 +4,31 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.ArrayList;
 
-public class BroadcastReceiverSocket {
+public class ReceiverSocket {
 	DatagramSocket socket = null;
 	
-	BroadcastReceiverSocket() {
+	ReceiverSocket() {
 		this(12112);
 	}
 	
-	BroadcastReceiverSocket(int port) {
+	ReceiverSocket(int port) {
+		this("0.0.0.0", port);
+		try {
+			socket.setBroadcast(true);
+		}
+		catch (IOException e) {
+			System.out.println("Error: " + e.toString());
+		}
+	}
+	
+	ReceiverSocket(String address) {
+		this(address, 12112);
+	}
+	
+	ReceiverSocket(String address, int port) {
 		//TODO: verify if port range is valid
 		try {
-			socket = new DatagramSocket(port, InetAddress.getByName("0.0.0.0"));
-			socket.setBroadcast(true);
+			socket = new DatagramSocket(port, InetAddress.getByName(address));
 			
 		}
 		catch (IOException ex) {

@@ -3,23 +3,39 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.SocketException;
 
-public class BroadcastSenderSocket {
+public class SenderSocket {
 	DatagramSocket socket = null;
+	InetAddress receiverAddress = null;
 	
-	BroadcastSenderSocket() {
+	SenderSocket() {
 		this(12113);
 	}
 	
-	BroadcastSenderSocket(int port) {
+	SenderSocket(int port) {
+		this("255.255.255.255", port);
+		
+		try {
+			socket.setBroadcast(true);
+		}
+		catch (SocketException e) {
+			System.out.println("Error: " + e.toString());
+		}
+	}
+	
+	SenderSocket(String address) {
+		this(address, 12113);
+	}
+	
+	SenderSocket(String address, int port) {
 		//TODO: verify if port range is valid
 		try {
 			socket = new DatagramSocket(port, InetAddress.getByName("0.0.0.0"));
-			socket.setBroadcast(true);
-			
+			receiverAddress = InetAddress.getByName(address);
 		}
-		catch (IOException ex) {
-			System.out.println("Error: " + ex.toString());
+		catch (IOException e) {
+			System.out.println("Error: " + e.toString());
 		}
 	}
 	
@@ -27,7 +43,7 @@ public class BroadcastSenderSocket {
 		//TODO: check content size before sending
 		try {
 			DatagramPacket dp = new DatagramPacket(content, content.length, 
-					InetAddress.getByName("255.255.255.255"), 12112);
+					receiverAddress, 12112);
 			socket.send(dp);
 			System.out.println("Message sent via broadcast");
 		}
