@@ -48,12 +48,11 @@ public class SenderSocket {
 
 	void sendData(byte[] content, String address, int port) {
 		//TODO: check content size before sending
-		System.out.println("Sending message to " + address + ':' + Integer.toString(port));
 		try {
 			DatagramPacket dp = new DatagramPacket(content, content.length, 
 					InetAddress.getByName(address), port);
 			socket.send(dp);
-			System.out.println("Message sent via broadcast");
+			System.out.println("Message sent to " + address + ':' + Integer.toString(port));
 		}
 		catch (Exception e) {
 			System.out.println("Error: " + e.toString());

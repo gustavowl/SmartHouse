@@ -63,6 +63,7 @@ public class ReceiverSocket {
 	private ArrayList<DatagramPacket> runSocket(int packetsMax, String code) throws IOException {
 		ArrayList<DatagramPacket> toReturn = new ArrayList<DatagramPacket>();
 		do {
+			System.out.println("Waiting for more packages");
 			ArrayList<DatagramPacket> packetsRcvd = runSocket(packetsMax);
 			for (DatagramPacket packetMsg : packetsRcvd) {
 				String message = new String(packetMsg.getData());
@@ -93,9 +94,7 @@ public class ReceiverSocket {
 	//TODO: create struct or class for codes
 	ArrayList<DatagramPacket> receiveData(int packetsMax, String code) {
 		try {
-			System.out.println("Teste1");
 			ArrayList<DatagramPacket> toReturn = runSocket(packetsMax, code);
-			System.out.println("Teste2");
 			return toReturn;
 		}
 		catch (IOException e) {

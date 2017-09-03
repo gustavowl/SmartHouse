@@ -42,7 +42,8 @@ public class Main {
 					
 					//STEP 3
 					messageByte = "CONFRM_IOT".getBytes();
-					sender.sendData(messageByte, dataFromIoT.getAddress().toString(), dataFromIoT.getPort());
+					sender.sendData(messageByte, dataFromIoT.getAddress().getHostAddress(),
+							dataFromIoT.getPort() - 1);
 					
 					//STEP 4
 					ids.add("ID" + Integer.toString(ids.size() + 1));
@@ -77,8 +78,8 @@ public class Main {
 				messageByte = messageStr.getBytes();
 				for (int attempts = 0; attempts <= 5; attempts++) {
 					if (attempts < 5) {
-						sender.sendData(messageByte, dataFromApp.getAddress().toString(),
-								dataFromApp.getPort());
+						sender.sendData(messageByte, dataFromApp.getAddress().getHostAddress(),
+								dataFromApp.getPort() - 1);
 						
 						//STEP 3
 						DatagramPacket dataRecvd = discoverableSocket.receiveData("CONFRM_IOT", 1000);
