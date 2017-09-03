@@ -75,11 +75,22 @@ public class Main {
 				sender = new BroadcastSenderSocket();
 				String messageStr = "CANICON_ID"; 
 				messageByte = messageStr.getBytes();
-				sender.sendData(messageByte);
+				for (int attempts = 0; attempts <= 5; attempts++) {
+					if (attempts < 5) {
+						sender.sendData(messageByte);
+						
+						//STEP 3
+						String dataRecvd = discoverableSocket.receiveData("CONFRM_IOT", 1000);
+						if (dataRecvd.equals("CONFRM_IOT" )) {
+							System.out.println("IoT device recognized by Server");
+							break;
+						}
+					}
+					else {
+						System.out.println("IoT device was not recognized by Server. Timeout.");
+					}
+				}
 				
-				//STEP 3
-				discoverableSocket.receiveData(1, "CONFRM_IOT");
-				System.out.println("IoT device recognized by Server");
 				break;
 			default: 
 				System.out.println("Invalid input");
