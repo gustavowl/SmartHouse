@@ -81,7 +81,7 @@ public class Main {
 						
 						//STEP 3
 						String dataRecvd = discoverableSocket.receiveData("CONFRM_IOT", 1000);
-						if (dataRecvd.equals("CONFRM_IOT" )) {
+						if (dataRecvd != null && dataRecvd.equals("CONFRM_IOT" )) {
 							System.out.println("IoT device recognized by Server");
 							break;
 						}

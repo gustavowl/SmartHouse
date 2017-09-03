@@ -33,7 +33,7 @@ public class BroadcastReceiverSocket {
 			socket.receive(packet);
 			
 	        //Packet received
-			toReturn.add(packet.getData().toString());
+			toReturn.add(new String(packet.getData()));
 			/* do not print because Single Responsibility
 			System.out.println("-------------------------");
 			System.out.println(getClass().getName() + "Packet received from: " + packet.getAddress().getHostAddress());
@@ -52,6 +52,8 @@ public class BroadcastReceiverSocket {
 		do {
 			ArrayList<String> packetsRcvd = runSocket(packetsMax);
 			for (String packetMsg : packetsRcvd) {
+				System.out.println("\t" + packetMsg);
+				System.out.println("\t" + code);
 				if (packetMsg.equals(code)) {
 					toReturn.add(packetMsg);
 				}
@@ -77,7 +79,10 @@ public class BroadcastReceiverSocket {
 	//TODO: create struct or class for codes
 	ArrayList<String> receiveData(int packetsMax, String code) {
 		try {
-			return runSocket(packetsMax, code);
+			System.out.println("Teste1");
+			ArrayList<String> toReturn = runSocket(packetsMax, code);
+			System.out.println("Teste2");
+			return toReturn;
 		}
 		catch (IOException e) {
 			System.out.println("Error: " + e.toString());
