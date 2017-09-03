@@ -36,9 +36,9 @@ public class ReceiverSocket {
 		}
 	}
 	
-	private ArrayList<String> runSocket(int packetsMax) throws IOException {
+	private ArrayList<DatagramPacket> runSocket(int packetsMax) throws IOException {
 		//returns the content of all packages read in order.
-		ArrayList<String> toReturn = new ArrayList<String>();
+		ArrayList<DatagramPacket> toReturn = new ArrayList<DatagramPacket>();
 		//max number of packets to be received. -1 = infinity
 		while (packetsMax != 0) {
 			byte[] rcvdInfo = new byte[10];
@@ -46,7 +46,7 @@ public class ReceiverSocket {
 			socket.receive(packet);
 			
 	        //Packet received
-			toReturn.add(new String(packet.getData()));
+			toReturn.add(packet);
 			/* do not print because Single Responsibility
 			System.out.println("-------------------------");
 			System.out.println(getClass().getName() + "Packet received from: " + packet.getAddress().getHostAddress());
@@ -60,14 +60,15 @@ public class ReceiverSocket {
 	//returns packages received with a given code
 	//e.g. DISCVR_IOT, CONFRM_IOT, and CANICON_ID
 	//TODO: create struct or class for codes
-	private ArrayList<String> runSocket(int packetsMax, String code) throws IOException {
-		ArrayList<String> toReturn = new ArrayList<String>();
+	private ArrayList<DatagramPacket> runSocket(int packetsMax, String code) throws IOException {
+		ArrayList<DatagramPacket> toReturn = new ArrayList<DatagramPacket>();
 		do {
-			ArrayList<String> packetsRcvd = runSocket(packetsMax);
-			for (String packetMsg : packetsRcvd) {
-				System.out.println("\t" + packetMsg);
+			ArrayList<DatagramPacket> packetsRcvd = runSocket(packetsMax);
+			for (DatagramPacket packetMsg : packetsRcvd) {
+				String message = new String(packetMsg.getData());
+				System.out.println("\t" + message);
 				System.out.println("\t" + code);
-				if (packetMsg.equals(code)) {
+				if (message.equals(code)) {
 					toReturn.add(packetMsg);
 				}
 			}
@@ -76,7 +77,7 @@ public class ReceiverSocket {
 		return toReturn;	
 	}
 	
-	ArrayList<String> receiveData(int packetsMax) {
+	ArrayList<DatagramPacket> receiveData(int packetsMax) {
 		//returns the content of all packages read in order.
 		try {
 			return runSocket(packetsMax);
@@ -90,10 +91,10 @@ public class ReceiverSocket {
 	//returns packages received with a given code
 	//e.g. DISCVR_IOT, CONFRM_IOT, and CANICON_ID
 	//TODO: create struct or class for codes
-	ArrayList<String> receiveData(int packetsMax, String code) {
+	ArrayList<DatagramPacket> receiveData(int packetsMax, String code) {
 		try {
 			System.out.println("Teste1");
-			ArrayList<String> toReturn = runSocket(packetsMax, code);
+			ArrayList<DatagramPacket> toReturn = runSocket(packetsMax, code);
 			System.out.println("Teste2");
 			return toReturn;
 		}
@@ -103,10 +104,10 @@ public class ReceiverSocket {
 		}
 	}
 	
-	String receiveData(String code, int timeout) {
+	DatagramPacket receiveData(String code, int timeout) {
 		try {
 			socket.setSoTimeout(timeout);
-			ArrayList<String> toReturn = runSocket(1, code);
+			ArrayList<DatagramPacket> toReturn = runSocket(1, code);
 			return toReturn.get(0);
 		}
 		catch (Exception e) {

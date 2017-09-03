@@ -1,4 +1,5 @@
-import java.util.Scanner; 
+import java.util.Scanner;
+import java.net.DatagramPacket;
 import java.util.ArrayList;
 
 public class Main {
@@ -19,7 +20,7 @@ public class Main {
 				System.out.println("You chose App/Server"); //TODO: class
 				
 				/* Protocol outline:
-				 * 1 - Sends message in broadcast in order to discover new devices
+				 * 1 - Sends broadcast message in order to discover new devices
 				 * 2 - Receives messages from multiple devices
 				 * 3 - Sends message confirming or denying connection to devices
 				 * 4 - Add device to list
@@ -37,12 +38,11 @@ public class Main {
 				while (true) {
 					//STEP 2
 					//TODO: create Threads in order to avoid losing packets
-					receiver.receiveData(1, "CANICON_ID");
+					DatagramPacket dataFromIoT = receiver.receiveData(1, "CANICON_ID").get(0);
 					
 					//STEP 3
 					messageByte = "CONFRM_IOT".getBytes();
-					//TODO: send message individually. Currently broadcasting
-					sender.sendData(messageByte);
+					sender.sendData(messageByte, dataFromIoT.getAddress().toString(), dataFromIoT.getPort());
 					
 					//STEP 4
 					ids.add("ID" + Integer.toString(ids.size() + 1));
@@ -69,19 +69,20 @@ public class Main {
 				
 				//STEP 1
 				ReceiverSocket discoverableSocket = new ReceiverSocket();
-				discoverableSocket.receiveData(1, "DISCVR_IOT");
+				DatagramPacket dataFromApp = discoverableSocket.receiveData(1, "DISCVR_IOT").get(0);
 				
 				//STEP 2
-				sender = new SenderSocket();
+				sender = new SenderSocket("0.0.0.0");
 				String messageStr = "CANICON_ID"; 
 				messageByte = messageStr.getBytes();
 				for (int attempts = 0; attempts <= 5; attempts++) {
 					if (attempts < 5) {
-						sender.sendData(messageByte);
+						sender.sendData(messageByte, dataFromApp.getAddress().toString(),
+								dataFromApp.getPort());
 						
 						//STEP 3
-						String dataRecvd = discoverableSocket.receiveData("CONFRM_IOT", 1000);
-						if (dataRecvd != null && dataRecvd.equals("CONFRM_IOT" )) {
+						DatagramPacket dataRecvd = discoverableSocket.receiveData("CONFRM_IOT", 1000);
+						if (dataRecvd != null) {
 							System.out.println("IoT device recognized by Server");
 							break;
 						}

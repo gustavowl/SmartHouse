@@ -7,14 +7,13 @@ import java.net.SocketException;
 
 public class SenderSocket {
 	DatagramSocket socket = null;
-	InetAddress receiverAddress = null;
 	
 	SenderSocket() {
 		this(12113);
 	}
 	
 	SenderSocket(int port) {
-		this("255.255.255.255", port);
+		this("0.0.0.0", port);
 		
 		try {
 			socket.setBroadcast(true);
@@ -31,8 +30,7 @@ public class SenderSocket {
 	SenderSocket(String address, int port) {
 		//TODO: verify if port range is valid
 		try {
-			socket = new DatagramSocket(port, InetAddress.getByName("0.0.0.0"));
-			receiverAddress = InetAddress.getByName(address);
+			socket = new DatagramSocket(port, InetAddress.getByName(address));
 		}
 		catch (IOException e) {
 			System.out.println("Error: " + e.toString());
@@ -40,10 +38,20 @@ public class SenderSocket {
 	}
 	
 	void sendData(byte[] content) {
+		sendData(content, "255.255.255.255", 12112);
+	}
+	
+	void sendData(byte[] content, int port) {
 		//TODO: check content size before sending
+		sendData(content, "255.255.255.255", port);
+	}
+
+	void sendData(byte[] content, String address, int port) {
+		//TODO: check content size before sending
+		System.out.println("Sending message to " + address + ':' + Integer.toString(port));
 		try {
 			DatagramPacket dp = new DatagramPacket(content, content.length, 
-					receiverAddress, 12112);
+					InetAddress.getByName(address), port);
 			socket.send(dp);
 			System.out.println("Message sent via broadcast");
 		}
