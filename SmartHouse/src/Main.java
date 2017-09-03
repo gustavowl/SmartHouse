@@ -37,7 +37,7 @@ public class Main {
 				while (true) {
 					//STEP 2
 					//TODO: create Threads in order to avoid losing packets
-					receiver.receiveData(1);
+					receiver.receiveData(1, "CANICON_ID");
 					
 					//STEP 3
 					messageByte = "CONFRM_IOT".getBytes();
@@ -69,7 +69,7 @@ public class Main {
 				
 				//STEP 1
 				BroadcastReceiverSocket discoverableSocket = new BroadcastReceiverSocket();
-				discoverableSocket.receiveData(1);
+				discoverableSocket.receiveData(1, "DISCVR_IOT");
 				
 				//STEP 2
 				sender = new BroadcastSenderSocket();
@@ -78,7 +78,8 @@ public class Main {
 				sender.sendData(messageByte);
 				
 				//STEP 3
-				discoverableSocket.receiveData(1);
+				discoverableSocket.receiveData(1, "CONFRM_IOT");
+				System.out.println("IoT device recognized by Server");
 				break;
 			default: 
 				System.out.println("Invalid input");
