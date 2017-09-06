@@ -25,6 +25,10 @@ abstract public class IOTDevice {
 		return peerPort;
 	}
 	
+	public ArrayList<Method> getMethods() {
+		return methods;
+	}
+	
 	public abstract void update();
 	
 	public abstract void remove();
