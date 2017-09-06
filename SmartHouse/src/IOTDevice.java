@@ -5,6 +5,7 @@ abstract public class IOTDevice {
 	protected InetAddress peerAddress;
 	protected int peerPort;
 	protected ArrayList<Method> methods;
+	protected String name;
 	
 	protected IOTDevice() {
 		this(null, 0);
@@ -27,6 +28,10 @@ abstract public class IOTDevice {
 	
 	public ArrayList<Method> getMethods() {
 		return methods;
+	}
+	
+	public String getName() {
+		return name;
 	}
 	
 	public abstract void update();
