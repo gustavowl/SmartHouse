@@ -27,12 +27,12 @@ public class Main {
 				 * 5 - Print current devices
 				 */
 				
-				SenderSocket sender = new SenderSocket();
-				ReceiverSocket receiver = new ReceiverSocket();
+				ReceiverSocket receiver = new ReceiverSocket(12112);
+				SenderSocket sender = new SenderSocket(12113);
 
 				//STEP 1				
 				byte[] messageByte = "DISCVR_IOT".getBytes();
-				sender.sendData(messageByte);
+				sender.sendData(messageByte, 12114);
 				ArrayList<String> ids = new ArrayList<String>();
 				
 				while (true) {
@@ -69,11 +69,11 @@ public class Main {
 				 */
 				
 				//STEP 1
-				ReceiverSocket discoverableSocket = new ReceiverSocket();
+				ReceiverSocket discoverableSocket = new ReceiverSocket(12114);
 				DatagramPacket dataFromApp = discoverableSocket.receiveData(1, "DISCVR_IOT").get(0);
 				
 				//STEP 2
-				sender = new SenderSocket("0.0.0.0");
+				sender = new SenderSocket("0.0.0.0", 12115);
 				String messageStr = "CANICON_ID"; 
 				messageByte = messageStr.getBytes();
 				for (int attempts = 0; attempts <= 5; attempts++) {
