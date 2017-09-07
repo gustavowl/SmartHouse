@@ -90,6 +90,8 @@ public class App {
 		
 		finished = true;
 		iotsFound = null;
+		sender.close();
+		receiver.close();
 	}
 	
 	static class ThreadAppDiscover extends Thread {

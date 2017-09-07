@@ -6,7 +6,7 @@ import java.net.InetAddress;
 import java.net.SocketException;
 
 public class SenderSocket {
-	DatagramSocket socket = null;
+	private DatagramSocket socket = null;
 	
 	SenderSocket() {
 		this(12113);
@@ -35,6 +35,10 @@ public class SenderSocket {
 		catch (IOException e) {
 			System.out.println("Error: " + e.toString());
 		}
+	}
+	
+	public void close() {
+		socket.close();
 	}
 	
 	void sendData(byte[] content) {

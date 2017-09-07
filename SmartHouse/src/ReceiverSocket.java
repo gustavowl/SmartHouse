@@ -5,7 +5,7 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 
 public class ReceiverSocket {
-	DatagramSocket socket = null;
+	private DatagramSocket socket = null;
 	
 	ReceiverSocket() {
 		this(12112);
@@ -34,6 +34,10 @@ public class ReceiverSocket {
 		catch (IOException ex) {
 			System.out.println("Error: " + ex.toString());
 		}
+	}
+	
+	public void close() {
+		socket.close();
 	}
 	
 	private ArrayList<DatagramPacket> runSocket(int packetsMax) throws IOException {
