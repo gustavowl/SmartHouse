@@ -90,14 +90,16 @@ public class App {
 		
 		finished = true;
 		iotsFound = null;
+		tap.interrupt();
 		sender.close();
 		receiver.close();
 	}
 	
 	static class ThreadAppDiscover extends Thread {
-		ReceiverSocket receiver;
-		SenderSocket sender;
+		private ReceiverSocket receiver;
+		private SenderSocket sender;
 		private static ArrayList<String> text;
+		private ThreadWriter tw;
 		
 		public ThreadAppDiscover(String name, ReceiverSocket receiver, SenderSocket sender) {
 			super(name);
@@ -109,10 +111,15 @@ public class App {
 		@Override
 		public void run() {
 			//STEP 2
+			DatagramPacket dataFromIoT = null;
 			ThreadWriter tw = new ThreadWriter("Writer");
 			tw.start();
 			while (!finished) {
-				DatagramPacket dataFromIoT = receiver.receiveData(1, "CANICON_ID").get(0);
+				try {
+					dataFromIoT = receiver.receiveData(1, "CANICON_ID").get(0);
+				} catch (NullPointerException e) {
+					this.interrupt();
+				}
 				if (!finished) {
 					iotsFound.add(dataFromIoT); //STEP 3 and 4
 					text.add("ID");
@@ -127,6 +134,14 @@ public class App {
 				}
 			}
 			tw.interrupt();
+		}
+		
+		@Override
+		public void interrupt() {
+			super.interrupt();
+			if (tw != null) {
+				tw.interrupt();
+			}
 		}
 		
 		public static synchronized ArrayList<String> getText() {
