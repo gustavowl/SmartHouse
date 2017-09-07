@@ -3,18 +3,21 @@ import java.net.InetAddress;
 
 //IOTDevice representation as seen by the IOT itself
 public class IOT_IOTDevice extends IOTDevice {
+	ReceiverSocket receiver;
+	SenderSocket sender;
 	
 	public IOT_IOTDevice() {
-		super();
+		this(null, 0, "");
 	}
 	
 	public IOT_IOTDevice(String name) {
-		super(name);
+		this(null, 0, name);
 	}
 	
 	public IOT_IOTDevice(InetAddress peerAddress, int peerPort, String name) {
 		super(peerAddress, peerPort, name);
-		
+		receiver = new ReceiverSocket(12114);
+		sender = new SenderSocket("0.0.0.0", 12115);
 	}
 	
 	public void update() {
@@ -36,11 +39,9 @@ public class IOT_IOTDevice extends IOTDevice {
 		
 		while (!isPeerAddressValid()) {
 			//STEP 1
-			ReceiverSocket discoverableSocket = new ReceiverSocket(12114);
-			DatagramPacket dataFromApp = discoverableSocket.receiveData(1, "DISCVR_IOT").get(0);
+			DatagramPacket dataFromApp = receiver.receiveData(1, "DISCVR_IOT").get(0);
 			
 			//STEP 2
-			SenderSocket sender = new SenderSocket("0.0.0.0", 12115);
 			String messageStr = "CANICON_ID"; 
 			byte[] messageByte = messageStr.getBytes();
 			int attempts = 0;
@@ -50,19 +51,20 @@ public class IOT_IOTDevice extends IOTDevice {
 							dataFromApp.getPort() - 1);
 					
 					//STEP 3
-					DatagramPacket dataRecvd = discoverableSocket.receiveData("CONFRM_IOT", 1000);
+					DatagramPacket dataRecvd = receiver.receiveData("CONFRM_IOT", 1000);
 					if (dataRecvd != null) {
 						System.out.println("IoT device recognized by Server");
 						
 						//STEP 4
 						attempts = 0;
 						while (attempts <= 60) {
-							dataRecvd = discoverableSocket.receiveData("ADD_IOT", 1000);
+							dataRecvd = receiver.receiveData("ADD_IOT", 1000);
 							if (dataRecvd != null) {
 								peerAddress = dataFromApp.getAddress();
 								peerPort = dataFromApp.getPort();
 								break;
 							}
+							attempts++;
 						}
 						break;
 					}
@@ -70,8 +72,8 @@ public class IOT_IOTDevice extends IOTDevice {
 				else {
 					System.out.println("IoT device was not recognized by Server. Timeout.");
 				}
+				attempts++;
 			}
-			attempts++;
 		}
 	}
 	

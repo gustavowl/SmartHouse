@@ -12,7 +12,7 @@ abstract public class IOTDevice {
 	}
 	
 	protected IOTDevice(String name) {
-		this(null, 0, "");
+		this(null, 0, name);
 	}
 	
 	protected IOTDevice(InetAddress peerAddress, int peerPort, String name) {
