@@ -63,12 +63,14 @@ public class ReceiverSocket {
 	private ArrayList<DatagramPacket> runSocket(int packetsMax, String code) throws IOException {
 		ArrayList<DatagramPacket> toReturn = new ArrayList<DatagramPacket>();
 		do {
-			System.out.println("Waiting for more packages");
+			//FIXME: Delete next line
+			//System.out.println("Waiting for more packages");
 			ArrayList<DatagramPacket> packetsRcvd = runSocket(packetsMax);
 			for (DatagramPacket packetMsg : packetsRcvd) {
 				String message = new String(packetMsg.getData());
-				System.out.println("\t" + message);
-				System.out.println("\t" + code);
+				//FIXME: Delete next 2 lines
+				/*System.out.println("\t" + message);
+				System.out.println("\t" + code);*/
 				if (message.equals(code)) {
 					toReturn.add(packetMsg);
 				}
@@ -84,7 +86,8 @@ public class ReceiverSocket {
 			return runSocket(packetsMax);
 		}
 		catch (Exception e) {
-			System.out.println("Error: " + e.toString());
+			//FIXME: Remove next line
+			//System.out.println("Error: " + e.toString());
 			return null;
 		}
 	}
@@ -98,7 +101,8 @@ public class ReceiverSocket {
 			return toReturn;
 		}
 		catch (IOException e) {
-			System.out.println("Error: " + e.toString());
+			//FIXME: Remove next line
+			//System.out.println("Error: " + e.toString());
 			return null;
 		}
 	}
@@ -110,7 +114,8 @@ public class ReceiverSocket {
 			return toReturn.get(0);
 		}
 		catch (Exception e) {
-			System.out.println("Error: " + e.toString());
+			//FIXME: Remove next line
+			//System.out.println("Error: " + e.toString());
 			return null;
 		}
 	}

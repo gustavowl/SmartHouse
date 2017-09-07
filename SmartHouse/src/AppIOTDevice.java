@@ -1,5 +1,20 @@
+import java.net.InetAddress;
+
 //IOTDevice representation as seen by the App
 public class AppIOTDevice extends IOTDevice {
+	
+	public AppIOTDevice() {
+		super();
+	}
+	
+	public AppIOTDevice(String name) {
+		super(name);
+	}
+	
+	public AppIOTDevice(InetAddress peerAddress, int peerPort, String name) {
+		super(peerAddress, peerPort, name);
+		
+	}
 	
 	public void update() {
 		System.out.println("TODO: Implement update method");

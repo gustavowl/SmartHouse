@@ -8,12 +8,18 @@ abstract public class IOTDevice {
 	protected String name;
 	
 	protected IOTDevice() {
-		this(null, 0);
+		this(null, 0, "");
 	}
 	
-	protected IOTDevice(InetAddress peerAddress, int peerPort) {
+	protected IOTDevice(String name) {
+		this(null, 0, "");
+	}
+	
+	protected IOTDevice(InetAddress peerAddress, int peerPort, String name) {
 		this.peerAddress = peerAddress;
 		this.peerPort = peerPort;
+		this.name = name;
+		methods = new ArrayList<Method>();
 		methods.add(new Method("update"));
 		methods.add(new Method("remove"));
 	}
@@ -32,6 +38,10 @@ abstract public class IOTDevice {
 	
 	public String getName() {
 		return name;
+	}
+	
+	public boolean isPeerAddressValid() {
+		return peerAddress != null;
 	}
 	
 	public abstract void update();

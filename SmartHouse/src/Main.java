@@ -14,7 +14,6 @@ public class Main {
 		System.out.println("Choose your option:\n1 - App/Server\n2 - IoT Device");
 		Scanner scan = new Scanner(System.in);
 		int opt = scan.nextInt();
-		scan.close();
 		switch (opt) {
 			case 1:
 				System.out.println("You chose App/Server"); //TODO: class
@@ -94,10 +93,17 @@ public class Main {
 				}
 				
 				break;
+			case 3:
+				App app = new App();
+				app.run();
+			case 4:
+				IOT_IOTDevice iotDevice = new IOT_IOTDevice("Test");
+				iotDevice.run();
 			default: 
 				System.out.println("Invalid input");
 				break;
 		}
+		scan.close();
 		
 	}
 
