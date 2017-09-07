@@ -16,87 +16,9 @@ public class Main {
 		int opt = scan.nextInt();
 		switch (opt) {
 			case 1:
-				System.out.println("You chose App/Server"); //TODO: class
-				
-				/* Protocol outline:
-				 * 1 - Sends broadcast message in order to discover new devices
-				 * 2 - Receives messages from multiple devices
-				 * 3 - Sends message confirming or denying connection to devices
-				 * 4 - Add device to list
-				 * 5 - Print current devices
-				 */
-				
-				ReceiverSocket receiver = new ReceiverSocket(12112);
-				SenderSocket sender = new SenderSocket(12113);
-
-				//STEP 1				
-				byte[] messageByte = "DISCVR_IOT".getBytes();
-				sender.sendData(messageByte, 12114);
-				ArrayList<String> ids = new ArrayList<String>();
-				
-				while (true) {
-					//STEP 2
-					//TODO: create Threads in order to avoid losing packets
-					DatagramPacket dataFromIoT = receiver.receiveData(1, "CANICON_ID").get(0);
-					
-					//STEP 3
-					messageByte = "CONFRM_IOT".getBytes();
-					sender.sendData(messageByte, dataFromIoT.getAddress().getHostAddress(),
-							dataFromIoT.getPort() - 1);
-					
-					//STEP 4
-					ids.add("ID" + Integer.toString(ids.size() + 1));
-					
-					//STEP 5
-					String id;
-					System.out.println("-------------------------");
-					System.out.println(Integer.toString(ids.size()) + " device(s) discovered:");
-					for (int i = 0; i < ids.size() - 1; i++) {
-						id = ids.get(i);
-						System.out.print(id + ", ");
-					}
-					id = ids.get(ids.size() - 1);
-					System.out.println(id);
-					
-				}
-			case 2:
-				System.out.println("You chose IoT Device"); //TODO: class
-				/* Protocol outline:
-				 * 1 - Receives packet from the app, trying to discover new devices
-				 * 2 - Sends packet to the app with device ID
-				 * 2 - Receives packet from the app, confirming connection or denying connection 
-				 */
-				
-				//STEP 1
-				ReceiverSocket discoverableSocket = new ReceiverSocket(12114);
-				DatagramPacket dataFromApp = discoverableSocket.receiveData(1, "DISCVR_IOT").get(0);
-				
-				//STEP 2
-				sender = new SenderSocket("0.0.0.0", 12115);
-				String messageStr = "CANICON_ID"; 
-				messageByte = messageStr.getBytes();
-				for (int attempts = 0; attempts <= 5; attempts++) {
-					if (attempts < 5) {
-						sender.sendData(messageByte, dataFromApp.getAddress().getHostAddress(),
-								dataFromApp.getPort() - 1);
-						
-						//STEP 3
-						DatagramPacket dataRecvd = discoverableSocket.receiveData("CONFRM_IOT", 1000);
-						if (dataRecvd != null) {
-							System.out.println("IoT device recognized by Server");
-							break;
-						}
-					}
-					else {
-						System.out.println("IoT device was not recognized by Server. Timeout.");
-					}
-				}
-				
-				break;
-			case 3:
 				App app = new App();
 				app.run();
-			case 4:
+			case 2:
 				IOT_IOTDevice iotDevice = new IOT_IOTDevice("Test");
 				iotDevice.run();
 			default: 
