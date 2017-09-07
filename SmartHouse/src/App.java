@@ -81,7 +81,7 @@ public class App {
 			}
 			
 			//STEP 5
-			newIot = opt--;
+			newIot = opt - 1;
 			AppIOTDevice iotDiscovered = new AppIOTDevice(iotsFound.get(newIot).getAddress(),
 					iotsFound.get(newIot).getPort(), "ID" + Integer.toString(newIot+1));
 			connectedIots.add(iotDiscovered);

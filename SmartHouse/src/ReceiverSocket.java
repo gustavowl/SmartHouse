@@ -71,7 +71,7 @@ public class ReceiverSocket {
 				//FIXME: Delete next 2 lines
 				/*System.out.println("\t" + message);
 				System.out.println("\t" + code);*/
-				if (message.equals(code)) {
+				if (message.trim().equals(code.trim())) {
 					toReturn.add(packetMsg);
 				}
 			}

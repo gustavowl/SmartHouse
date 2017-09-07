@@ -52,7 +52,8 @@ public class SenderSocket {
 			DatagramPacket dp = new DatagramPacket(content, content.length, 
 					InetAddress.getByName(address), port);
 			socket.send(dp);
-			System.out.println("Message sent to " + address + ':' + Integer.toString(port));
+			//FIXME: Delete next line
+			//System.out.println("Message sent to " + address + ':' + Integer.toString(port));
 		}
 		catch (Exception e) {
 			System.out.println("Error: " + e.toString());
