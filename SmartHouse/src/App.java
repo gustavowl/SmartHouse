@@ -61,7 +61,7 @@ public class App {
 		finished = false;
 		ReceiverSocket receiver = new ReceiverSocket(12112);
 		SenderSocket sender = new SenderSocket(12113);
-		ThreadAppDiscover tap = new ThreadAppDiscover("Discover IOTs", receiver);
+		ThreadAppDiscover tap = new ThreadAppDiscover("Discover IOTs", receiver, sender);
 
 		//STEP 1				
 		byte[] messageByte = "DISCVR_IOT".getBytes();
@@ -73,10 +73,12 @@ public class App {
 		int opt = scan.nextInt();
 		if (opt > 0 && opt <= iotsFound.size()) {
 			//STEP 4
-			messageByte = "CONFRM_IOT".getBytes();
+			messageByte = "ADD_IOT".getBytes();
 			DatagramPacket iot = iotsFound.get(opt - 1);
-			sender.sendData(messageByte, iot.getAddress().getHostAddress(),
-					iot.getPort() - 1);
+			synchronized (sender) {
+				sender.sendData(messageByte, iot.getAddress().getHostAddress(),
+						iot.getPort() - 1);
+			}
 			
 			//STEP 5
 			newIot = opt--;
@@ -92,11 +94,13 @@ public class App {
 	
 	static class ThreadAppDiscover extends Thread {
 		ReceiverSocket receiver;
+		SenderSocket sender;
 		private static ArrayList<String> text;
 		
-		public ThreadAppDiscover(String name, ReceiverSocket receiver) {
+		public ThreadAppDiscover(String name, ReceiverSocket receiver, SenderSocket sender) {
 			super(name);
 			this.receiver = receiver;
+			this.sender = sender;
 			text = new ArrayList<String>();
 		}
 		
@@ -110,6 +114,11 @@ public class App {
 				if (!finished) {
 					iotsFound.add(dataFromIoT); //STEP 3 and 4
 					text.add("ID");
+					byte[] messageByte = "CONFRM_IOT".getBytes();
+					synchronized (sender) {
+						sender.sendData(messageByte, dataFromIoT.getAddress().getHostAddress(),
+								dataFromIoT.getPort() - 1);
+					}
 				}
 				synchronized (tw) {
 					tw.notify();

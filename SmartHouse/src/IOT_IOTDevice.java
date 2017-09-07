@@ -30,7 +30,8 @@ public class IOT_IOTDevice extends IOTDevice {
 		/* Protocol outline:
 		 * 1 - Receives packet from the app, trying to discover new devices
 		 * 2 - Sends packet to the app with device ID
-		 * 3 - Receives packet from the app, confirming connection or denying connection
+		 * 3 - Receives packet from the app, asking to stop sending connection requests
+		 * 4 - Receives packet from the app confirming connection
 		 */
 		
 		while (!isPeerAddressValid()) {
@@ -42,7 +43,8 @@ public class IOT_IOTDevice extends IOTDevice {
 			SenderSocket sender = new SenderSocket("0.0.0.0", 12115);
 			String messageStr = "CANICON_ID"; 
 			byte[] messageByte = messageStr.getBytes();
-			for (int attempts = 0; attempts <= 60; attempts++) {
+			int attempts = 0;
+			while (attempts <= 60) {
 				if (attempts < 60) {
 					sender.sendData(messageByte, dataFromApp.getAddress().getHostAddress(),
 							dataFromApp.getPort() - 1);
@@ -51,9 +53,17 @@ public class IOT_IOTDevice extends IOTDevice {
 					DatagramPacket dataRecvd = discoverableSocket.receiveData("CONFRM_IOT", 1000);
 					if (dataRecvd != null) {
 						System.out.println("IoT device recognized by Server");
-
-						peerAddress = dataFromApp.getAddress();
-						peerPort = dataFromApp.getPort();
+						
+						//STEP 4
+						attempts = 0;
+						while (attempts <= 60) {
+							dataRecvd = discoverableSocket.receiveData("CONFRM_IOT", 1000);
+							if (dataRecvd != null) {
+								peerAddress = dataFromApp.getAddress();
+								peerPort = dataFromApp.getPort();
+								break;
+							}
+						}
 						break;
 					}
 				}
@@ -61,6 +71,7 @@ public class IOT_IOTDevice extends IOTDevice {
 					System.out.println("IoT device was not recognized by Server. Timeout.");
 				}
 			}
+			attempts++;
 		}
 	}
 	
