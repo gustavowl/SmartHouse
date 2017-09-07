@@ -57,7 +57,7 @@ public class IOT_IOTDevice extends IOTDevice {
 						//STEP 4
 						attempts = 0;
 						while (attempts <= 60) {
-							dataRecvd = discoverableSocket.receiveData("CONFRM_IOT", 1000);
+							dataRecvd = discoverableSocket.receiveData("ADD_IOT", 1000);
 							if (dataRecvd != null) {
 								peerAddress = dataFromApp.getAddress();
 								peerPort = dataFromApp.getPort();
