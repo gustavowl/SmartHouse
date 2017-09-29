@@ -9,7 +9,8 @@ public abstract class Device {
 	
 	private String productID; 
 	private Boolean ligada;
-	private Integer wattage;
+	private int id;
+	private String nome;
 	
 	//zera o timer caso ativo
 	public void setTimer(int timed) {
@@ -62,12 +63,20 @@ public abstract class Device {
 		this.ligada = ligada;
 	}
 
-	public Integer getWattage() {
-		return wattage;
+	public int getId() {
+		return id;
 	}
 
-	public void setWattage(Integer wattage) {
-		this.wattage = wattage;
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public String getNome() {
+		return nome;
+	}
+
+	public void setNome(String nome) {
+		this.nome = nome;
 	}
     
  	
