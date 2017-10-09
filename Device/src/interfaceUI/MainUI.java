@@ -14,7 +14,7 @@ import java.util.TimerTask;
 import java.awt.event.ActionEvent;
 import javax.swing.SwingConstants;
 
-import device.Device;
+import Entity.Device;
 import javax.swing.JList;
 import javax.swing.AbstractListModel;
 
