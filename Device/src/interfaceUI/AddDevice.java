@@ -87,6 +87,7 @@ public class AddDevice extends JFrame {
 		btnSalvar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				addDevice();
+				
 			}
 		});
 		btnSalvar.setBounds(97, 211, 117, 25);
@@ -95,6 +96,7 @@ public class AddDevice extends JFrame {
 		JButton btnCancelar = new JButton("Fechar");
 		btnCancelar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				dispose();
 			}
 		});
 		btnCancelar.setBounds(258, 211, 117, 25);
@@ -126,14 +128,16 @@ public class AddDevice extends JFrame {
 			d = new WallSocket();
 		d.setNome(textField.getText());
 		
+		//Verifica se ja existe vom esse nome
+		boolean existeNaLista = false;
 		for(Device deviceTemp : connectedD.getDevices()) {
-			if(!deviceTemp.getNome().equals(d.getNome())) {
-				adicionaDevice(d);
+			if(deviceTemp.getNome().equals(d.getNome())) {
+				existeNaLista = true;
 			}
 				
 		}
 		
-		if(connectedD.getDevices().size() == 0) {
+		if(!existeNaLista) {
 			adicionaDevice(d);
 		}
 		
@@ -154,6 +158,7 @@ public class AddDevice extends JFrame {
 		connectedD.addDevice(d);
 		ui.addNewDevice(d);
 		textField.setText("");
+		ui.verificaBotao();
 		
 		
 	}

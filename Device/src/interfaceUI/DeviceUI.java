@@ -27,8 +27,14 @@ public class DeviceUI extends JFrame{
 	public static int interval;
 	private ConnectedDevices connectedD;
 	private AddDevice addDevice;
+	private SobreDevice sobreDevice;
 	DefaultListModel model;
-	JList<Device> list;
+	private JButton btnRemoveDevice;
+	private JButton btnsobre;
+	private JButton btnToggleOnoff;
+	private JButton btnSetTimer;
+	private JButton btnWattage;
+	private JList<String> jlist;
 
 	/**
 	 * Launch the application.
@@ -58,15 +64,17 @@ public class DeviceUI extends JFrame{
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private void initialize() {
-		list = new JList<Device>();
 		model = new DefaultListModel();
 		addDevice = new AddDevice();
+		sobreDevice = new SobreDevice();
 		addDevice.instancia(this);
+		sobreDevice.instancia(this);
 		connectedD = new ConnectedDevices();
 		lampada = new JanelaLampada();
 		frame = new JFrame();
 		frame.setBounds(100, 100, 450, 300);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
 		
 		JPanel panel = new JPanel();
 		frame.getContentPane().add(panel, BorderLayout.CENTER);
@@ -77,21 +85,24 @@ public class DeviceUI extends JFrame{
 			public void actionPerformed(ActionEvent e) {
 				//Adiciona um Device	
 				addDevice();
+				verificaBotao();
 			}
 		});
-		btnAddDevice.setBounds(105, 222, 111, 25);
+		btnAddDevice.setBounds(105, 222, 139, 25);
 		panel.add(btnAddDevice);
 		
-		JButton btnRemoveDevice = new JButton("Remove Device");
+		btnRemoveDevice = new JButton("Remove Device");
+		btnRemoveDevice.setEnabled(false);
 		btnRemoveDevice.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				rmvDevice();
+				verificaBotao();
 			}
 		});
-		btnRemoveDevice.setBounds(260, 222, 139, 25);
+		btnRemoveDevice.setBounds(105, 259, 139, 25);
 		panel.add(btnRemoveDevice);
 		
-		JList<Device> list = new JList<Device>();
+		jlist = new JList<String>();
 		/*list.setModel(new AbstractListModel() {
 			String[] values = new String[] {"Lampada",
 					"Device 2", "Device 3", "Device 4", "Device 5", "Device 6", "Device 7 ", "Device 8"};
@@ -106,11 +117,11 @@ public class DeviceUI extends JFrame{
 			}
 		});*/
 		
-		list.setModel(model);
-		list.setBounds(106, 42, 130, 154);
-		panel.add(list);
+		jlist.setModel(model);
+		jlist.setBounds(106, 42, 130, 154);
+		panel.add(jlist);
 		
-		JButton btnToggleOnoff = new JButton("ON/OFF");
+		btnToggleOnoff = new JButton("ON/OFF");
 		btnToggleOnoff.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				toggleOnOff();
@@ -120,7 +131,7 @@ public class DeviceUI extends JFrame{
 		btnToggleOnoff.setBounds(260, 40, 117, 25);
 		panel.add(btnToggleOnoff);
 		
-		JButton btnSetTimer = new JButton("Set Timer");
+		btnSetTimer = new JButton("Set Timer");
 		btnSetTimer.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				setTimer(6);
@@ -129,9 +140,21 @@ public class DeviceUI extends JFrame{
 		btnSetTimer.setBounds(260, 100, 117, 25);
 		panel.add(btnSetTimer);
 		
-		JButton btnWattage = new JButton("Wattage");
+		btnWattage = new JButton("Wattage");
 		btnWattage.setBounds(260, 160, 117, 25);
 		panel.add(btnWattage);
+		
+		btnsobre = new JButton("Sobre");
+		btnsobre.setEnabled(false);
+		btnsobre.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				sobreDevice.setUi();
+				sobreDevice.setVisible(true);
+			}
+		});
+		btnsobre.setBounds(260, 210, 117, 25);
+		panel.add(btnsobre);
+		verificaBotao();
 
 	}
 	
@@ -181,17 +204,22 @@ public class DeviceUI extends JFrame{
 		}*/
 		//INSTANCIA A NOVA JANELA
 		addDevice.setVisible(true);
-		System.out.println(list.getSelectedIndex());
 		
 	}
 	
 	public void rmvDevice() {
 		for(Device deviceTemp : connectedD.getDevices()) {
-			if(model.getElementAt(list.getSelectedIndex()).equals(deviceTemp.getNome())) {
-				model.remove(list.getSelectedIndex());
+			if(jlist.getSelectedValue().equals(deviceTemp.getNome())) {
+				
+				//Remove da Jlist
+				model.remove(jlist.getSelectedIndex());
+				
+				//Remove da lista de Devices conectados
 				connectedD.getDevices().remove(deviceTemp);
+				break;
 			}
 		}
+		
 	}
 	
 	public void addNewDevice(Device dev) {
@@ -200,6 +228,23 @@ public class DeviceUI extends JFrame{
 			model.addElement(dev.getNome());
 		//}
 			
+	}
+	
+	public void verificaBotao() {
+		if(model.getSize() > 0) {
+			btnRemoveDevice.setEnabled(true);
+			btnsobre.setEnabled(true);
+			btnToggleOnoff.setEnabled(true);
+			btnSetTimer.setEnabled(true);
+			btnWattage.setEnabled(true);
+		}
+		else {
+			btnRemoveDevice.setEnabled(false);
+			btnsobre.setEnabled(false);
+			btnToggleOnoff.setEnabled(false);
+			btnSetTimer.setEnabled(false);
+			btnWattage.setEnabled(false);
+		}
 	}
 
 	public JFrame getFrame() {
@@ -217,6 +262,23 @@ public class DeviceUI extends JFrame{
 	public void setModel(DefaultListModel model) {
 		this.model = model;
 	}
+
+	public JList<String> getJlist() {
+		return jlist;
+	}
+
+	public void setJlist(JList<String> jlist) {
+		this.jlist = jlist;
+	}
+
+	public ConnectedDevices getConnectedD() {
+		return connectedD;
+	}
+
+	public void setConnectedD(ConnectedDevices connectedD) {
+		this.connectedD = connectedD;
+	}
+	
 	
 	
 	

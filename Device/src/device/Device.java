@@ -11,6 +11,11 @@ public abstract class Device {
 	private Boolean ligada;
 	private int id;
 	private String nome;
+	private String tipo;
+	
+	Device() {
+		tipo = "";
+	}
 	
 	//zera o timer caso ativo
 	public void setTimer(int timed) {
@@ -78,6 +83,16 @@ public abstract class Device {
 	public void setNome(String nome) {
 		this.nome = nome;
 	}
+
+	public String getTipo() {
+		return tipo;
+	}
+
+	public void setTipo(String tipo) {
+		this.tipo = tipo;
+	}
+	
+	
     
  	
 }
