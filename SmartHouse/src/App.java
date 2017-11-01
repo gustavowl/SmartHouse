@@ -72,7 +72,8 @@ public class App {
 		if (opt > 0 ) {
 			AppIOTDevice iot = iotsDiscovered.get(opt - 1);
 			
-			//STEP 4: TODO
+			protocol.confirmConnection(iot); //STEP 4
+			connectedIots.add(iot); //STEP 5
 		}
 		iotsDiscovered.clear();
 		iotsDiscovered = null;
@@ -93,7 +94,7 @@ public class App {
 			System.out.println("0 - Quit");
 			while (true) {
 				iots = protocol.getIotsDiscovered();
-				for (; iots.size() > 0; i++) {
+				for (; iots != null && iots.size() > 0; i++) {
 					System.out.println(Integer.toString(i+1) + " - " + 
 							Integer.toString(i));
 					iotsDiscovered.add( (AppIOTDevice)iots.remove(0) );

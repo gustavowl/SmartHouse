@@ -32,9 +32,11 @@ public class Protocol {
 		
 		if (finish) {
 			iotDiscoverer.interrupt();
-			iotsFound = null;
-			sender.close();
+			iotsFound.clear();
+			//sender.close();
+			//sender = null;
 			receiver.close();
+			//receiver = null;
 			iotDiscoverer = null;
 		}
 		
@@ -69,10 +71,18 @@ public class Protocol {
 	}
 	
 	public ArrayList<IOTDevice> getAndClearIotsFound() {
-		ArrayList<IOTDevice> iots;
-		synchronized (iotsFound) {
-			iots = (ArrayList<IOTDevice>) iotsFound.clone();
-			iotsFound.clear();
+		ArrayList<IOTDevice> iots = null;
+		if (iotsFound != null) {
+			synchronized (iotsFound) {
+				if (iotsFound == null) { //TODO remove
+					System.out.println("WHATHELL");
+				}
+				iots = (ArrayList<IOTDevice>) iotsFound.clone();
+				if (iotsFound == null) { //TODO remove
+					System.out.println("WHATHELL2");
+				}
+				iotsFound.removeAll(iotsFound);
+			}	
 		}
 		return iots;
 	}
@@ -80,6 +90,7 @@ public class Protocol {
 	static class ThreadIOTDiscoverer extends Thread {
 		private ReceiverSocket receiver;
 		private SenderSocket sender;
+		private boolean finished = false;
 		
 		public ThreadIOTDiscoverer(String name, ReceiverSocket receiver, SenderSocket sender) {
 			super(name);
@@ -91,7 +102,7 @@ public class Protocol {
 		public void run() {
 			//STEP 2
 			DatagramPacket dataFromIoT = null;
-			while (true) {
+			while (!finished) {
 				try {
 					dataFromIoT = receiver.receiveData(1, "CANICON_ID").get(0);
 				} catch (NullPointerException e) {
@@ -109,5 +120,22 @@ public class Protocol {
 				}
 			}
 		}
+		
+		@Override
+		public void interrupt() {
+			finished = true;
+			super.interrupt();
+		}
+	}
+
+	private void sendMessage(String content, String address, int port) {
+		//sender = new SenderSocket(12113);
+		byte[] message = content.getBytes();
+		sender.sendData(message, address, port);
+		sender.close();
+	}
+	
+	public void confirmDiscoveredIotConnection(IOTDevice iot) {
+		sendMessage("ADD_IOT", iot.getPeerAddress().toString(), iot.getPeerPort());
 	}
 }

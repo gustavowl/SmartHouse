@@ -1,4 +1,3 @@
-import java.net.DatagramPacket;
 import java.util.ArrayList;
 
 
@@ -20,6 +19,10 @@ public class ProtocolFacade {
 	
 	public ArrayList<IOTDevice> getIotsDiscovered() {
 		return protocol.getAndClearIotsFound();
+	}
+	
+	public void confirmConnection(IOTDevice iot) {
+		protocol.confirmDiscoveredIotConnection(iot);
 	}
 
 }
