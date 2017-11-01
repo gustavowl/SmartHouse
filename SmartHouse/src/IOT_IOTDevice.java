@@ -53,12 +53,13 @@ public class IOT_IOTDevice extends IOTDevice {
 					//STEP 3
 					DatagramPacket dataRecvd = receiver.receiveData("CONFRM_IOT", 1000);
 					if (dataRecvd != null) {
-						System.out.println("IoT device recognized by Server");
+						//System.out.println("IoT device recognized by Server");
 						
 						//STEP 4
 						attempts = 0;
 						while (attempts <= 60) {
 							dataRecvd = receiver.receiveData("ADD_IOT", 1000);
+							//System.out.print("HI");
 							if (dataRecvd != null) {
 								peerAddress = dataFromApp.getAddress();
 								peerPort = dataFromApp.getPort();
