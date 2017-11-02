@@ -118,7 +118,6 @@ public class Protocol {
 	}
 
 	public InetSocketAddress discoverServer(ReceiverSocket receiver, SenderSocket sender, String iotId) {
-		System.out.println("TODO: Implement discover method");
 		/* Protocol outline:
 		 * 1 - Receives packet from the app, trying to discover new devices
 		 * 2 - Sends packet to the app with device ID
@@ -140,13 +139,11 @@ public class Protocol {
 					//STEP 3
 					DatagramPacket dataRecvd = receiver.receiveData("CONFRM_IOT", 1000);
 					if (dataRecvd != null) {
-						//System.out.println("IoT device recognized by Server");
 						
 						//STEP 4
 						attempts = 0;
 						while (attempts <= 60) {
 							dataRecvd = receiver.receiveData("ADD_IOT", 1000);
-							//System.out.print("HI");
 							if (dataRecvd != null) {
 								InetSocketAddress address = new InetSocketAddress(
 										dataFromApp.getAddress(), dataFromApp.getPort());
@@ -158,7 +155,7 @@ public class Protocol {
 					}
 				}
 				else {
-					System.out.println("IoT device was not recognized by Server. Timeout.");
+					return null;
 				}
 				attempts++;
 			}

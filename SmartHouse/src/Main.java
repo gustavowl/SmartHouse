@@ -16,9 +16,11 @@ public class Main {
 			case 1:
 				App app = new App();
 				app.run();
+				break;
 			case 2:
 				IOT_IOTDevice iotDevice = new IOT_IOTDevice("Digivice");
 				iotDevice.run();
+				break;
 			default: 
 				System.out.println("Invalid input");
 				break;

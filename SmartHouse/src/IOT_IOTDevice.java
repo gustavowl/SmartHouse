@@ -41,15 +41,23 @@ public class IOT_IOTDevice extends IOTDevice {
 	}
 	
 	public void run() {
-		while (peerAddress == null) {
-			InetSocketAddress isa = protocol.ServerDiscoveryStart(receiver,
-					sender, getName());
-			System.out.println("HELLO " + isa.getAddress() == null);
-			setPeerAddress(isa.getAddress());
-			setPeerPort(isa.getPort());
-		}
-		while (peerAddress != null) {
-			listenToPeer();
+		while (true) {
+			while (true) {
+				InetSocketAddress isa = protocol.ServerDiscoveryStart(receiver,
+						sender, getName());
+				if (isa != null) {
+					setPeerAddress(isa.getAddress());
+					setPeerPort(isa.getPort());
+					break;
+				}
+				else {
+					System.out.println("IoT device was not recognized by Server. Timeout.");
+					continue;
+				}
+			}
+			while (peerAddress != null) {
+				listenToPeer();
+			}	
 		}
 	}
 }
