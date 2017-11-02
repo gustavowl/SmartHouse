@@ -4,15 +4,17 @@ import java.net.InetAddress;
 public class AppIOTDevice extends IOTDevice {
 	
 	public AppIOTDevice() {
-		super();
+		this("");
+		//creates local representation of IOT (local address)
 	}
 	
 	public AppIOTDevice(String name) {
-		super(name);
+		this(null, 0, name);
+		//creates local representation of IOT (local address)
 	}
 	
-	public AppIOTDevice(InetAddress peerAddress, int peerPort, String name) {
-		super(peerAddress, peerPort, name);
+	public AppIOTDevice(InetAddress address, int port, String name) {
+		super(address, port, name);
 		
 	}
 	

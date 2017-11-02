@@ -1,6 +1,3 @@
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.DatagramPacket;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -64,7 +61,9 @@ public class App {
 		
 		int opt = scan.nextInt();
 		while ( !(opt > 0 && opt <= iotsDiscovered.size()) ) {
-			System.out.println("INVALID OPTION");
+			System.out.println("INVALID OPTION. Range: " + 0 + " - " + 
+					iotsDiscovered.size());
+			opt = scan.nextInt();
 		}
 			
 		protocol.IOTDiscoveryStop();
@@ -81,6 +80,7 @@ public class App {
 	
 	class ThreadWriter extends Thread {
 		//TODO: transfer to GUI
+		boolean finish = false;
 		
 		public ThreadWriter(String name) {
 			super(name);
@@ -92,14 +92,21 @@ public class App {
 			ArrayList<IOTDevice> iots;
 			//STEP 3
 			System.out.println("0 - Quit");
-			while (true) {
+			while (!finish) {
 				iots = protocol.getIotsDiscovered();
 				for (; iots != null && iots.size() > 0; i++) {
+					AppIOTDevice iot = (AppIOTDevice)iots.remove(0);
 					System.out.println(Integer.toString(i+1) + " - " + 
-							Integer.toString(i));
-					iotsDiscovered.add( (AppIOTDevice)iots.remove(0) );
+							iot.getName() + Integer.toString(i));
+					iotsDiscovered.add(iot);
 				}
 			}
+		}
+		
+		@Override
+		public void interrupt() {
+			finish = true;
+			super.interrupt();
 		}
 	}
 	

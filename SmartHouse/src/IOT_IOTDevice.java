@@ -7,17 +7,20 @@ public class IOT_IOTDevice extends IOTDevice {
 	SenderSocket sender;
 	
 	public IOT_IOTDevice() {
-		this(null, 0, "");
+		this(12114, "", null, 0);
 	}
 	
 	public IOT_IOTDevice(String name) {
-		this(null, 0, name);
+		this(12114, name, null, 0);
 	}
 	
-	public IOT_IOTDevice(InetAddress peerAddress, int peerPort, String name) {
-		super(peerAddress, peerPort, name);
-		receiver = new ReceiverSocket(12114);
+	public IOT_IOTDevice(int port, String name,
+			InetAddress peerAddress, int peerPort) {
+		super(null, port, name);
+		receiver = new ReceiverSocket(port);
 		sender = new SenderSocket("0.0.0.0", 12115);
+		setPeerAddress(peerAddress);
+		setPeerPort(peerPort);
 	}
 	
 	public void update() {

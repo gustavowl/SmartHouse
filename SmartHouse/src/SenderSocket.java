@@ -61,7 +61,12 @@ public class SenderSocket {
 		}
 		catch (Exception e) {
 			System.out.println("Error: " + e.toString());
+			e.printStackTrace(System.out);
 		}
+	}
+	
+	public boolean isClosed() {
+		return socket.isClosed();
 	}
 	
 	//TODO: Destructor? Close socket

@@ -1,6 +1,4 @@
 import java.util.Scanner;
-import java.net.DatagramPacket;
-import java.util.ArrayList;
 
 public class Main {
 

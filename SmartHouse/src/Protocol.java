@@ -39,31 +39,12 @@ public class Protocol {
 			//receiver = null;
 			iotDiscoverer = null;
 		}
-		
-		/*
-		int opt = scan.nextInt();
-		if (opt > 0 && opt <= iotsFound.size()) {
-			//STEP 4
-			messageByte = "ADD_IOT".getBytes();
-			DatagramPacket iot = iotsFound.get(opt - 1);
-			synchronized (sender) {
-				sender.sendData(messageByte, iot.getAddress().getHostAddress(),
-						iot.getPort() - 1);
-			}
-			
-			//STEP 5
-			newIot = opt - 1;
-			AppIOTDevice iotDiscovered = new AppIOTDevice(iotsFound.get(newIot).getAddress(),
-					iotsFound.get(newIot).getPort(), "ID" + Integer.toString(newIot+1));
-			connectedIots.add(iotDiscovered);
-			
-		}*/
-
 	}
 	
 	private static IOTDevice extractIOTDeviceFromDatagram(DatagramPacket dp) {
 		String data = new String(dp.getData());
-		return new AppIOTDevice(dp.getAddress(), dp.getPort(), data.trim());
+		//System.out.println("------------\n" + data + "\n----------------");
+		return new AppIOTDevice(dp.getAddress(), dp.getPort() - 1, data.trim());
 	}
 	
 	public ArrayList<IOTDevice> getIotsFound() {
@@ -74,13 +55,7 @@ public class Protocol {
 		ArrayList<IOTDevice> iots = null;
 		if (iotsFound != null) {
 			synchronized (iotsFound) {
-				if (iotsFound == null) { //TODO remove
-					System.out.println("WHATHELL");
-				}
 				iots = (ArrayList<IOTDevice>) iotsFound.clone();
-				if (iotsFound == null) { //TODO remove
-					System.out.println("WHATHELL2");
-				}
 				iotsFound.removeAll(iotsFound);
 			}	
 		}
@@ -109,14 +84,17 @@ public class Protocol {
 					this.interrupt();
 				}
 				
+				IOTDevice iot = extractIOTDeviceFromDatagram(dataFromIoT);
 				synchronized (iotsFound) {
-					iotsFound.add(extractIOTDeviceFromDatagram(dataFromIoT)); //STEP 3
+					iotsFound.add(iot); //STEP 3
 				}
 
 				byte[] messageByte = "CONFRM_IOT".getBytes();
 				synchronized (sender) {
-					sender.sendData(messageByte, dataFromIoT.getAddress().getHostAddress(),
-							dataFromIoT.getPort() - 1);
+					if (!sender.isClosed()) {
+						sender.sendData(messageByte, iot.getAddress().getHostAddress(),
+								iot.getListenerPort());
+					}
 				}
 			}
 		}
@@ -136,6 +114,6 @@ public class Protocol {
 	}
 	
 	public void confirmDiscoveredIotConnection(IOTDevice iot) {
-		sendMessage("ADD_IOT", iot.getPeerAddress().toString(), iot.getPeerPort());
+		sendMessage("ADD_IOT", iot.getAddress().getHostAddress(), iot.getListenerPort());
 	}
 }
