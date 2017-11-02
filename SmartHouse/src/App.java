@@ -6,11 +6,15 @@ public class App {
 	private ArrayList<AppIOTDevice> iotsDiscovered;
 	private Scanner scan;
 	private ProtocolFacade protocol;
+	private ReceiverSocket receiver;
+	private SenderSocket sender;
 	
 	public App() {
 		connectedIots = new ArrayList<AppIOTDevice>();
 		scan = new Scanner(System.in);
 		protocol = new ProtocolFacade();
+		receiver = new ReceiverSocket(ProtocolFacade.getStandardServerReceiverPort());
+		sender = new SenderSocket(ProtocolFacade.getStandardServerSenderPort());
 	}
 	
 	//TODO: extends runnable?
@@ -54,7 +58,7 @@ public class App {
 		 * 4 - Sends message confirming or denying connection to devices
 		 * 5 - Adds IoT to list of recognized devices
 		 */
-		protocol.IOTDiscoveryStart();
+		protocol.IOTDiscoveryStart(receiver, sender);
 		iotsDiscovered = new ArrayList<AppIOTDevice>();
 		ThreadWriter tw = new ThreadWriter("Writer");
 		tw.start();
@@ -71,7 +75,7 @@ public class App {
 		if (opt > 0 ) {
 			AppIOTDevice iot = iotsDiscovered.get(opt - 1);
 			
-			protocol.confirmConnection(iot); //STEP 4
+			protocol.confirmConnection(iot, sender); //STEP 4
 			connectedIots.add(iot); //STEP 5
 		}
 		iotsDiscovered.clear();

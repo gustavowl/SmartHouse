@@ -1,4 +1,3 @@
-import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 
@@ -9,18 +8,17 @@ public class IOT_IOTDevice extends IOTDevice {
 	ProtocolFacade protocol;
 	
 	public IOT_IOTDevice() {
-		this(12114, "", null, 0);
+		this(ProtocolFacade.getStandardIotReceiverPort(), "", null, 0);
 	}
 	
 	public IOT_IOTDevice(String name) {
-		this(12114, name, null, 0);
+		this(ProtocolFacade.getStandardIotReceiverPort(), name, null, 0);
 	}
 	
-	public IOT_IOTDevice(int port, String name,
-			InetAddress peerAddress, int peerPort) {
+	public IOT_IOTDevice(int port, String name, InetAddress peerAddress, int peerPort) {
 		super(null, port, name);
 		receiver = new ReceiverSocket(port);
-		sender = new SenderSocket("0.0.0.0", 12115);
+		sender = new SenderSocket("0.0.0.0", ProtocolFacade.getStandardIotSenderPort());
 		setPeerAddress(peerAddress);
 		setPeerPort(peerPort);
 		protocol = new ProtocolFacade();
@@ -46,6 +44,7 @@ public class IOT_IOTDevice extends IOTDevice {
 		while (peerAddress == null) {
 			InetSocketAddress isa = protocol.ServerDiscoveryStart(
 					receiver, sender);
+			System.out.println("HELLO " + isa.getAddress() == null);
 			setPeerAddress(isa.getAddress());
 			setPeerPort(isa.getPort());
 		}

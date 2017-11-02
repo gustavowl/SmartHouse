@@ -45,7 +45,7 @@ public class ReceiverSocket {
 		ArrayList<DatagramPacket> toReturn = new ArrayList<DatagramPacket>();
 		//max number of packets to be received. -1 = infinity
 		while (packetsMax != 0) {
-			byte[] rcvdInfo = new byte[10];
+			byte[] rcvdInfo = new byte[256];
 			DatagramPacket packet = new DatagramPacket(rcvdInfo, rcvdInfo.length);
 			socket.receive(packet);
 			
@@ -67,15 +67,9 @@ public class ReceiverSocket {
 	private ArrayList<DatagramPacket> runSocket(int packetsMax, String code) throws IOException {
 		ArrayList<DatagramPacket> toReturn = new ArrayList<DatagramPacket>();
 		do {
-			//FIXME: Delete next line
-			//System.out.println("Waiting for more packages");
 			ArrayList<DatagramPacket> packetsRcvd = runSocket(packetsMax);
 			for (DatagramPacket packetMsg : packetsRcvd) {
-				String message = new String(packetMsg.getData());
-				//FIXME: Delete next 2 lines
-				/*System.out.println("\t" + message);
-				System.out.println("\t" + code);*/
-				if (message.trim().equals(code.trim())) {
+				if (ProtocolMessage.getMessageCode(packetMsg.getData()).trim().equals(code.trim())) {
 					toReturn.add(packetMsg);
 				}
 			}
@@ -90,8 +84,6 @@ public class ReceiverSocket {
 			return runSocket(packetsMax);
 		}
 		catch (Exception e) {
-			//FIXME: Remove next line
-			//System.out.println("Error: " + e.toString());
 			return null;
 		}
 	}
@@ -105,8 +97,6 @@ public class ReceiverSocket {
 			return toReturn;
 		}
 		catch (IOException e) {
-			//FIXME: Remove next line
-			//System.out.println("Error: " + e.toString());
 			return null;
 		}
 	}
@@ -118,8 +108,6 @@ public class ReceiverSocket {
 			return toReturn.get(0);
 		}
 		catch (Exception e) {
-			//FIXME: Remove next line
-			//System.out.println("Error: " + e.toString());
 			return null;
 		}
 	}

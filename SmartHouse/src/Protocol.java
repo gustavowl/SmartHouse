@@ -4,15 +4,18 @@ import java.util.ArrayList;
 
 
 public class Protocol {
+	public static final int SERVER_RECEIVER_PORT = 12112;
+	public static final int SERVER_SENDER_PORT = SERVER_RECEIVER_PORT + 1;
+	public static final int IOT_RECEIVER_PORT = 12114;
+	public static final int IOT_SENDER_PORT = IOT_RECEIVER_PORT + 1;
 	
 	private static volatile ArrayList<IOTDevice> iotsFound;
-	private ReceiverSocket receiver;
-	private SenderSocket sender;
 	private ThreadIOTDiscoverer iotDiscoverer;
 	
 	public Protocol() {}
 	
-	public void discoverIot(boolean restart, boolean finish) {
+	public void discoverIot(boolean restart, boolean finish, ReceiverSocket receiver,
+			SenderSocket sender) {
 		/* Protocol outline:
 		 * 1 - Sends broadcast message in order to discover new devices
 		 * 2 - Receives messages from multiple devices
@@ -21,30 +24,23 @@ public class Protocol {
 		
 		if (restart) {
 			iotsFound = new ArrayList<IOTDevice>();
-			receiver = new ReceiverSocket(12112);
-			sender = new SenderSocket(12113);
 			iotDiscoverer = new ThreadIOTDiscoverer("Discover IOTs", receiver, sender);
 			
 			//STEP 1				
-			byte[] messageByte = "DISCVR_IOT".getBytes();
-			sender.sendData(messageByte, 12114);
+			sendMessage("DISCVR_IOT", "", IOT_RECEIVER_PORT, sender);
 			iotDiscoverer.start(); //STEP 2 and 3
 		}
 		
 		if (finish) {
 			iotDiscoverer.interrupt();
 			iotsFound.clear();
-			//sender.close();
-			//sender = null;
-			receiver.close();
-			//receiver = null;
 			iotDiscoverer = null;
 		}
 	}
 	
 	private static IOTDevice extractIOTDeviceFromDatagram(DatagramPacket dp) {
 		String data = new String(dp.getData());
-		//System.out.println("------------\n" + data + "\n----------------");
+		//port at datagram is sender. Receiver will be it - 1 (check constants)
 		return new AppIOTDevice(dp.getAddress(), dp.getPort() - 1, data.trim());
 	}
 	
@@ -91,12 +87,9 @@ public class Protocol {
 					iotsFound.add(iot); //STEP 3
 				}
 
-				byte[] messageByte = "CONFRM_IOT".getBytes();
 				synchronized (sender) {
-					if (!sender.isClosed()) {
-						sender.sendData(messageByte, iot.getAddress().getHostAddress(),
-								iot.getListenerPort());
-					}
+					Protocol.sendMessage("CONFRM_IOT", "", iot.getAddress().getHostAddress(),
+							iot.getListenerPort(), sender);
 				}
 			}
 		}
@@ -107,16 +100,21 @@ public class Protocol {
 			super.interrupt();
 		}
 	}
+	
+	private static void sendMessage(String code, String content, int port, SenderSocket sender) {
+		//broadcast
+		byte[] message = ProtocolMessage.createMessage(code, content);
+		sender.sendData(message, port);
+	}
 
-	private void sendMessage(String content, String address, int port) {
-		//sender = new SenderSocket(12113);
-		byte[] message = content.getBytes();
+	private static void sendMessage(String code, String content, String address, int port, SenderSocket sender) {
+		//unicast
+		byte[] message = ProtocolMessage.createMessage(code, content);
 		sender.sendData(message, address, port);
-		sender.close();
 	}
 	
-	public void confirmDiscoveredIotConnection(IOTDevice iot) {
-		sendMessage("ADD_IOT", iot.getAddress().getHostAddress(), iot.getListenerPort());
+	public void confirmDiscoveredIotConnection(IOTDevice iot, SenderSocket sender) {
+		sendMessage("ADD_IOT", "", iot.getAddress().getHostAddress(), iot.getListenerPort(), sender);
 	}
 
 	public InetSocketAddress discoverServer(ReceiverSocket receiver, SenderSocket sender) {
@@ -133,13 +131,11 @@ public class Protocol {
 			DatagramPacket dataFromApp = receiver.receiveData(1, "DISCVR_IOT").get(0);
 			
 			//STEP 2
-			String messageStr = "CANICON_ID"; 
-			byte[] messageByte = messageStr.getBytes();
 			int attempts = 0;
 			while (attempts <= 60) {
 				if (attempts < 60) {
-					sender.sendData(messageByte, dataFromApp.getAddress().getHostAddress(),
-							dataFromApp.getPort() - 1);
+					sendMessage("CANICON_ID", "",dataFromApp.getAddress().getHostAddress(),
+							dataFromApp.getPort() - 1, sender);
 					
 					//STEP 3
 					DatagramPacket dataRecvd = receiver.receiveData("CONFRM_IOT", 1000);
