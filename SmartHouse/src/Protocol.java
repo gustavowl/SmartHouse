@@ -1,4 +1,5 @@
 import java.net.DatagramPacket;
+import java.net.InetSocketAddress;
 import java.util.ArrayList;
 
 
@@ -11,7 +12,7 @@ public class Protocol {
 	
 	public Protocol() {}
 	
-	public void discover(boolean restart, boolean finish) {
+	public void discoverIot(boolean restart, boolean finish) {
 		/* Protocol outline:
 		 * 1 - Sends broadcast message in order to discover new devices
 		 * 2 - Receives messages from multiple devices
@@ -51,6 +52,7 @@ public class Protocol {
 		return iotsFound;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public ArrayList<IOTDevice> getAndClearIotsFound() {
 		ArrayList<IOTDevice> iots = null;
 		if (iotsFound != null) {
@@ -115,5 +117,55 @@ public class Protocol {
 	
 	public void confirmDiscoveredIotConnection(IOTDevice iot) {
 		sendMessage("ADD_IOT", iot.getAddress().getHostAddress(), iot.getListenerPort());
+	}
+
+	public InetSocketAddress discoverServer(ReceiverSocket receiver, SenderSocket sender) {
+		System.out.println("TODO: Implement discover method");
+		/* Protocol outline:
+		 * 1 - Receives packet from the app, trying to discover new devices
+		 * 2 - Sends packet to the app with device ID
+		 * 3 - Receives packet from the app, asking to stop sending connection requests
+		 * 4 - Receives packet from the app confirming connection
+		 */
+		
+		while (true) {
+			//STEP 1
+			DatagramPacket dataFromApp = receiver.receiveData(1, "DISCVR_IOT").get(0);
+			
+			//STEP 2
+			String messageStr = "CANICON_ID"; 
+			byte[] messageByte = messageStr.getBytes();
+			int attempts = 0;
+			while (attempts <= 60) {
+				if (attempts < 60) {
+					sender.sendData(messageByte, dataFromApp.getAddress().getHostAddress(),
+							dataFromApp.getPort() - 1);
+					
+					//STEP 3
+					DatagramPacket dataRecvd = receiver.receiveData("CONFRM_IOT", 1000);
+					if (dataRecvd != null) {
+						//System.out.println("IoT device recognized by Server");
+						
+						//STEP 4
+						attempts = 0;
+						while (attempts <= 60) {
+							dataRecvd = receiver.receiveData("ADD_IOT", 1000);
+							//System.out.print("HI");
+							if (dataRecvd != null) {
+								InetSocketAddress address = new InetSocketAddress(
+										dataFromApp.getAddress(), dataFromApp.getPort());
+								return address;
+							}
+							attempts++;
+						}
+						break;
+					}
+				}
+				else {
+					System.out.println("IoT device was not recognized by Server. Timeout.");
+				}
+				attempts++;
+			}
+		}
 	}
 }

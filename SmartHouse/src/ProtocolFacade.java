@@ -1,5 +1,5 @@
+import java.net.InetSocketAddress;
 import java.util.ArrayList;
-
 
 public class ProtocolFacade {
 	
@@ -10,11 +10,16 @@ public class ProtocolFacade {
 	}
 	
 	public void IOTDiscoveryStart() {
-		protocol.discover(true, false);
+		protocol.discoverIot(true, false);
 	}
 	
 	public void IOTDiscoveryStop() {
-		protocol.discover(false, true);
+		protocol.discoverIot(false, true);
+	}
+	
+	public InetSocketAddress ServerDiscoveryStart(ReceiverSocket receiver,
+			SenderSocket sender) {
+		return protocol.discoverServer(receiver, sender);
 	}
 	
 	public ArrayList<IOTDevice> getIotsDiscovered() {
