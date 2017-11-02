@@ -37,11 +37,22 @@ public class IOT_IOTDevice extends IOTDevice {
 	}
 	
 	public void listenToPeer() {
-		System.out.println("TODO: wait for peer action requests");
+		/* Commands available:
+		 * 1 - Remove connection with server
+		 * 2 - Execute Method
+		 * 3 - Get List of Methods
+		 * 4 - Update (?)
+		 * 5 - Check for updates (?)
+		 * 6 - List consumption (?)
+		 */
+		String request = protocol.listenToServerRequests(getPeerAddress(),
+				getPeerPort(), receiver);
+		System.out.println(request);
 	}
 	
 	public void run() {
 		while (true) {
+			System.out.println("Wait for server Discovery request");
 			while (true) {
 				InetSocketAddress isa = protocol.ServerDiscoveryStart(receiver,
 						sender, getName());
@@ -55,6 +66,7 @@ public class IOT_IOTDevice extends IOTDevice {
 					continue;
 				}
 			}
+			System.out.println("Listening for server requests");
 			while (peerAddress != null) {
 				listenToPeer();
 			}	

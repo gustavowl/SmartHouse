@@ -1,3 +1,4 @@
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 
@@ -46,4 +47,9 @@ public class ProtocolFacade {
 		return Protocol.IOT_SENDER_PORT;
 	}
 
+	public String listenToServerRequests(InetAddress serverAddress, int serverPort,
+			ReceiverSocket receiver) {
+		
+		return null;
+	}
 }

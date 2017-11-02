@@ -1,4 +1,5 @@
 import java.net.DatagramPacket;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 
@@ -8,6 +9,16 @@ public class Protocol {
 	public static final int SERVER_SENDER_PORT = SERVER_RECEIVER_PORT + 1;
 	public static final int IOT_RECEIVER_PORT = 12114;
 	public static final int IOT_SENDER_PORT = IOT_RECEIVER_PORT + 1;
+	public static final String[] VALID_SERVER_REQUESTS = {"DSCNCT_IOT", "RUNIOTFUNC", "GETFUNCLST"};
+	/* {DISCONNECT_IOT, RUN_IOT_FUNCTION, GET_LIST_OF_FUNCTIONS } 
+	 * Commands available:
+	 * 1 - Remove connection with server
+	 * 2 - Execute Method
+	 * 3 - Get List of Methods
+	 * 4 - Update (?)
+	 * 5 - Check for updates (?)
+	 * 6 - List consumption (?)
+	 */
 	
 	private static volatile ArrayList<IOTDevice> iotsFound;
 	private ThreadIOTDiscoverer iotDiscoverer;
@@ -160,5 +171,26 @@ public class Protocol {
 				attempts++;
 			}
 		}
+	}
+	
+	public String listenToServerRequests(InetAddress serverAddress, int serverPort,
+			ReceiverSocket receiver) {
+		while (true) {
+			//Listens to server
+			DatagramPacket dp = receiver.receiveData(1).get(0);
+			String code = ProtocolMessage.getMessageCode(dp.getData());
+			if (isServerRequestValid(code)) {
+				return code;
+			}
+		}
+	}
+	
+	private boolean isServerRequestValid(String requestCode) {
+		for (String code : VALID_SERVER_REQUESTS) {
+			if (requestCode.equals(code)) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

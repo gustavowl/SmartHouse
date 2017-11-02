@@ -19,6 +19,7 @@ public class Main {
 				break;
 			case 2:
 				IOT_IOTDevice iotDevice = new IOT_IOTDevice("Digivice");
+				System.out.println("Starts running IoT \"" + iotDevice.getName() + "\"");
 				iotDevice.run();
 				break;
 			default: 
