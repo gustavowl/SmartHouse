@@ -20,8 +20,6 @@ public final class ProtocolMessage {
 	public static String getMessageContent(byte[] message) {
 		String messageStr = new String(message);
 		int index = messageStr.indexOf(SEPARATOR);
-		System.out.println(messageStr);
-		System.out.println(messageStr.substring(index + 1));
 		return messageStr.substring(index + 1);		
 	}
 }

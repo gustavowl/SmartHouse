@@ -101,7 +101,7 @@ public class App {
 				for (; iots != null && iots.size() > 0; i++) {
 					AppIOTDevice iot = (AppIOTDevice)iots.remove(0);
 					System.out.println(Integer.toString(i+1) + " - " + 
-							iot.getName() + Integer.toString(i));
+							iot.getName());
 					iotsDiscovered.add(iot);
 				}
 			}

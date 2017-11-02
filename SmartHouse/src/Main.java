@@ -17,7 +17,7 @@ public class Main {
 				App app = new App();
 				app.run();
 			case 2:
-				IOT_IOTDevice iotDevice = new IOT_IOTDevice("Test");
+				IOT_IOTDevice iotDevice = new IOT_IOTDevice("Digivice");
 				iotDevice.run();
 			default: 
 				System.out.println("Invalid input");

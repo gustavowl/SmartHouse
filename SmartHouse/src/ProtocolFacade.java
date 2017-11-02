@@ -18,8 +18,8 @@ public class ProtocolFacade {
 	}
 	
 	public InetSocketAddress ServerDiscoveryStart(ReceiverSocket receiver,
-			SenderSocket sender) {
-		return protocol.discoverServer(receiver, sender);
+			SenderSocket sender, String iotId) {
+		return protocol.discoverServer(receiver, sender, iotId);
 	}
 	
 	public ArrayList<IOTDevice> getIotsDiscovered() {

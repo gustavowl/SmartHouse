@@ -39,9 +39,9 @@ public class Protocol {
 	}
 	
 	private static IOTDevice extractIOTDeviceFromDatagram(DatagramPacket dp) {
-		String data = new String(dp.getData());
 		//port at datagram is sender. Receiver will be it - 1 (check constants)
-		return new AppIOTDevice(dp.getAddress(), dp.getPort() - 1, data.trim());
+		return new AppIOTDevice(dp.getAddress(), dp.getPort() - 1, 
+				ProtocolMessage.getMessageContent(dp.getData()));
 	}
 	
 	public ArrayList<IOTDevice> getIotsFound() {
@@ -117,7 +117,7 @@ public class Protocol {
 		sendMessage("ADD_IOT", "", iot.getAddress().getHostAddress(), iot.getListenerPort(), sender);
 	}
 
-	public InetSocketAddress discoverServer(ReceiverSocket receiver, SenderSocket sender) {
+	public InetSocketAddress discoverServer(ReceiverSocket receiver, SenderSocket sender, String iotId) {
 		System.out.println("TODO: Implement discover method");
 		/* Protocol outline:
 		 * 1 - Receives packet from the app, trying to discover new devices
@@ -134,7 +134,7 @@ public class Protocol {
 			int attempts = 0;
 			while (attempts <= 60) {
 				if (attempts < 60) {
-					sendMessage("CANICON_ID", "",dataFromApp.getAddress().getHostAddress(),
+					sendMessage("CANICON_ID", iotId, dataFromApp.getAddress().getHostAddress(),
 							dataFromApp.getPort() - 1, sender);
 					
 					//STEP 3

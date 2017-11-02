@@ -42,8 +42,8 @@ public class IOT_IOTDevice extends IOTDevice {
 	
 	public void run() {
 		while (peerAddress == null) {
-			InetSocketAddress isa = protocol.ServerDiscoveryStart(
-					receiver, sender);
+			InetSocketAddress isa = protocol.ServerDiscoveryStart(receiver,
+					sender, getName());
 			System.out.println("HELLO " + isa.getAddress() == null);
 			setPeerAddress(isa.getAddress());
 			setPeerPort(isa.getPort());
