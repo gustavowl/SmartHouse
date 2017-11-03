@@ -1,6 +1,7 @@
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class ProtocolFacade {
 	
@@ -27,8 +28,8 @@ public class ProtocolFacade {
 		return protocol.getAndClearIotsFound();
 	}
 	
-	public void confirmConnection(IOTDevice iot, SenderSocket sender) {
-		protocol.confirmDiscoveredIotConnection(iot, sender);
+	public void confirmConnection(InetAddress address, SenderSocket sender) {
+		protocol.confirmDiscoveredIotConnection(address, sender);
 	}
 	
 	public static int getStandardServerReceiverPort() { 
@@ -47,9 +48,75 @@ public class ProtocolFacade {
 		return Protocol.IOT_SENDER_PORT;
 	}
 
-	public String listenToServerRequests(InetAddress serverAddress, int serverPort,
-			ReceiverSocket receiver) {
+	public String listenToServerRequests(InetAddress serverAddress, ReceiverSocket receiver) {
+		String code = null;
+		while (code == null) {
+			code = protocol.listenToServerRequests(serverAddress, receiver);
+		}
+		return code; 
+	}
+	
+	public void answerServerRequest(String code, InetAddress serverAddress, SenderSocket sender) {
+		int opt = -1;
+		for (int i = 0; i < Protocol.VALID_SERVER_REQUESTS.length; i++) {
+			if (code.equals(Protocol.VALID_SERVER_REQUESTS[i])) {
+				opt = i;
+				break;
+			}
+		}
+		switch (opt) {
+			case 0: //"DSCNCT_IOT"
+				System.out.println("IOT DISCONNECT FROM SERVER");
+				Protocol.iotDisconnectFromServer(serverAddress, sender);
+				break;
+			case 1: //"CHCK_UPDT"
+				break;
+			case 2: //"UPDATE"
+				break;
+		}
+	}
+	
+	public static String[] getValidServerRequestsDescriptions() {
+		return Protocol.VALID_SERVER_REQUESTS_DESCRIPTIONS;
+	}
+	
+	public static boolean isGetDevicesFunctionalities(int index) {
+		return index == 3;
+	}
+	
+	//disconnect, update, check for updates
+	public static String runGeneralServerRequest(int requestIndex, ArrayList<AppIOTDevice> 
+		connectedIots, int iotIndex, SenderSocket sender, ReceiverSocket receiver) {
 		
-		return null;
+		switch (requestIndex) {
+			case 0: //"DSCNCT_IOT"
+				byte[] msgByte = Protocol.serverRequestDisconnectIot(connectedIots.get(iotIndex).getAddress(),
+						sender, receiver);
+
+				if (ProtocolMessage.getMessageCode(msgByte).equals("TIMEOUT")) {
+					return iotTimeout(connectedIots, iotIndex); 
+				}
+				AppIOTDevice iot = connectedIots.remove(iotIndex);
+				System.out.println("TODO: SOMEBODY SAVE ME");
+				return "The device \"" + iot.getName() + "\" was removed from the list of connected devices.";
+				
+			case 1: //"CHCK_UPDT"
+				return "";
+			case 2: //"UPDATE"
+				return "";
+		}
+		return "Not a general server request.";
+	}
+	
+	private static String iotTimeout(ArrayList<AppIOTDevice> connectedIots, int index) {
+		AppIOTDevice iot = connectedIots.remove(index);
+		System.out.println("TODO: REMOVE EH O FRESQUE");
+		return "The device " + iot.getName() +
+				" did not respond, Request timeout" +
+				"\nDevice removed from the list of connected devices.";
+	}
+
+	public static boolean isDisconnectRequest(String code) {
+		return code.equals(Protocol.VALID_SERVER_REQUESTS[0]);
 	}
 }

@@ -4,9 +4,9 @@ import java.util.ArrayList;
 
 abstract public class IOTDevice {
 	protected InetAddress address;
-	protected int listenerPort;
+	//protected int listenerPort;
 	protected InetAddress peerAddress;
-	protected int peerPort;
+	//protected int peerPort;
 	protected ArrayList<Method> methods;
 	protected String name;
 	
@@ -26,10 +26,10 @@ abstract public class IOTDevice {
 			InetSocketAddress isa = new InetSocketAddress("0.0.0.0", 0);
 			this.address = isa.getAddress();
 		}
-		this.listenerPort = listenerPort;
+		//this.listenerPort = listenerPort;
 		this.name = name;
 		this.peerAddress = null;
-		this.peerPort = 0;
+		//this.peerPort = 0;
 		methods = new ArrayList<Method>();
 		methods.add(new Method("update"));
 		methods.add(new Method("remove"));
@@ -39,26 +39,26 @@ abstract public class IOTDevice {
 		this.peerAddress = peerAddress;
 	}
 	
-	public void setPeerPort(int peerPort) {
+	/*public void setPeerPort(int peerPort) {
 		//TODO: verify if range is valid
 		this.peerPort = peerPort;
-	}
+	}*/
 	
 	public InetAddress getAddress() {
 		return address;
 	}
 	
-	public int getListenerPort() {
+	/*public int getListenerPort() {
 		return listenerPort;
-	}
+	}*/
 	
 	public InetAddress getPeerAddress() {
 		return peerAddress;
 	}
 	
-	public int getPeerPort() {
+	/*public int getPeerPort() {
 		return peerPort;
-	}
+	}*/
 	
 	public ArrayList<Method> getMethods() {
 		return methods;

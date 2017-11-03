@@ -13,7 +13,7 @@ public class App {
 		connectedIots = new ArrayList<AppIOTDevice>();
 		scan = new Scanner(System.in);
 		protocol = new ProtocolFacade();
-		receiver = new ReceiverSocket(ProtocolFacade.getStandardServerReceiverPort());
+		receiver = new ReceiverSocket();
 		sender = new SenderSocket(ProtocolFacade.getStandardServerSenderPort());
 	}
 	
@@ -64,7 +64,7 @@ public class App {
 		tw.start();
 		
 		int opt = scan.nextInt();
-		while ( !(opt > 0 && opt <= iotsDiscovered.size()) ) {
+		while ( !(opt >= 0 && opt <= iotsDiscovered.size()) ) {
 			System.out.println("INVALID OPTION. Range: " + 0 + " - " + 
 					iotsDiscovered.size());
 			opt = scan.nextInt();
@@ -75,7 +75,7 @@ public class App {
 		if (opt > 0 ) {
 			AppIOTDevice iot = iotsDiscovered.get(opt - 1);
 			
-			protocol.confirmConnection(iot, sender); //STEP 4
+			protocol.confirmConnection(iot.getAddress(), sender); //STEP 4
 			connectedIots.add(iot); //STEP 5
 		}
 		iotsDiscovered.clear();
@@ -84,7 +84,7 @@ public class App {
 	
 	class ThreadWriter extends Thread {
 		//TODO: transfer to GUI
-		boolean finish = false;
+		volatile boolean finish = false;
 		
 		public ThreadWriter(String name) {
 			super(name);
@@ -115,11 +115,65 @@ public class App {
 	}
 	
 	private void selectIOT() {
-		System.out.println("Select an IOT from the following list:\n0 - Quit");
-		int i = 1;
-		for (AppIOTDevice iot : connectedIots) {
-			System.out.println(Integer.toString(i) + " - " + iot.getName());
+		boolean finish = false;
+		while (!finish) {
+			//TODO: Transfer to GUI
+			System.out.println("Select an IOT from the following list:\n0 - Quit");
+			int opt = 1;
+			for (AppIOTDevice iot : connectedIots) {
+				System.out.println(Integer.toString(opt) + " - " + iot.getName());
+			}
+			
+			opt = scan.nextInt();
+			if (opt > 0 && opt <= connectedIots.size()) {
+				finish = listSelectIotOptions(opt - 1);
+			}
+			else if (opt == 0) {
+				finish = true;
+			}
+			else {
+				System.out.println("Please enter a valid option\n-----------------");
+			}
 		}
-		System.out.println("TODO: IMPLEMENT THIS");
+	}
+	
+	//@returns true if "quit/return" option selected
+	//@returns false if operation involving iot was selected
+	private boolean listSelectIotOptions(int index) {
+		boolean isOptionInvalid = true;
+		int opt = 0;
+		while (isOptionInvalid) {
+			//TODO: Transfer to GUI
+			//prints requests
+			String[] options = ProtocolFacade.getValidServerRequestsDescriptions();
+			for (int i = 0; i < options.length; i++) {
+				System.out.println((i + 1) + " - " + options[i]);
+			}
+			
+			//reads and validates option
+			opt = scan.nextInt();
+			if (opt > 0 && opt <= options.length) {
+				opt--;
+				if (ProtocolFacade.isGetDevicesFunctionalities(opt)) {
+					//TODO: print list of available options
+					System.out.println("TODO: print list of available options");
+				}
+				else {
+					//TODO: send to GUI
+					System.out.println("Size: " + connectedIots.size());
+					System.out.println(ProtocolFacade.runGeneralServerRequest(
+							opt, connectedIots, index, sender, receiver));
+					System.out.println("Size: " + connectedIots.size());
+				}
+				opt++;
+				break;
+			}
+			else if (opt == 0) {
+				//isOptionInvalid = false;
+				break;
+			}
+			System.out.println("Please enter a valid option\n-----------------");
+		}
+		return opt == 0;
 	}
 }

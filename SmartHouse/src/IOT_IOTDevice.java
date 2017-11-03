@@ -8,19 +8,20 @@ public class IOT_IOTDevice extends IOTDevice {
 	ProtocolFacade protocol;
 	
 	public IOT_IOTDevice() {
-		this(ProtocolFacade.getStandardIotReceiverPort(), "", null, 0);
+		this(ProtocolFacade.getStandardIotReceiverPort(), "", null);
 	}
 	
 	public IOT_IOTDevice(String name) {
-		this(ProtocolFacade.getStandardIotReceiverPort(), name, null, 0);
+		this(ProtocolFacade.getStandardIotReceiverPort(), name, null);
 	}
 	
-	public IOT_IOTDevice(int port, String name, InetAddress peerAddress, int peerPort) {
+	public IOT_IOTDevice(int port, String name, InetAddress peerAddress) {
 		super(null, port, name);
-		receiver = new ReceiverSocket(port);
+		receiver = new ReceiverSocket();
+		//listenerPort = port;
 		sender = new SenderSocket("0.0.0.0", ProtocolFacade.getStandardIotSenderPort());
 		setPeerAddress(peerAddress);
-		setPeerPort(peerPort);
+		//setPeerPort(peerPort);
 		protocol = new ProtocolFacade();
 	}
 	
@@ -45,9 +46,13 @@ public class IOT_IOTDevice extends IOTDevice {
 		 * 5 - Check for updates (?)
 		 * 6 - List consumption (?)
 		 */
-		String request = protocol.listenToServerRequests(getPeerAddress(),
-				getPeerPort(), receiver);
-		System.out.println(request);
+		String code = protocol.listenToServerRequests(getPeerAddress(), receiver);
+		protocol.answerServerRequest(code, getPeerAddress(), sender);
+		if (ProtocolFacade.isDisconnectRequest(code)) {
+			peerAddress = null;
+			//TODO: change to GUI
+			System.out.println("Disconnected by the server");
+		}
 	}
 	
 	public void run() {
@@ -58,7 +63,6 @@ public class IOT_IOTDevice extends IOTDevice {
 						sender, getName());
 				if (isa != null) {
 					setPeerAddress(isa.getAddress());
-					setPeerPort(isa.getPort());
 					break;
 				}
 				else {

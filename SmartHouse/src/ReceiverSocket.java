@@ -2,12 +2,17 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.util.ArrayList;
 
 public class ReceiverSocket {
-	private DatagramSocket socket = null;
+	private DatagramSocket socket;
 	
 	ReceiverSocket() {
+		socket = null;
+	}
+	
+	/*ReceiverSocket() {
 		this(12112);
 	}
 	
@@ -34,10 +39,51 @@ public class ReceiverSocket {
 		catch (IOException ex) {
 			System.out.println("Error: " + ex.toString());
 		}
-	}
+	}*/
 	
 	public void close() {
-		socket.close();
+		if (socket != null && !socket.isClosed()) {
+			socket.close();
+		}
+	}
+	
+	public void open() {
+		open(12112);
+	}
+	
+	public void open(int port) {
+		open("0.0.0.0", port);
+		if (socket != null) {
+			try {
+				socket.setBroadcast(true);
+			}
+			catch (IOException e) {
+				System.out.println("Error: " + e.toString());
+				e.printStackTrace(System.out);
+			}
+		}
+	}
+	
+	public void open(String address) {
+		open(address, 12112);
+	}
+	
+	public void open(String address, int port) {
+		if (socket == null || socket.isClosed()) {
+			//TODO: verify if port range is valid
+			try {
+				socket = new DatagramSocket(null);
+				socket.bind(new InetSocketAddress(InetAddress.getByName(address), port));
+				socket.setBroadcast(false);
+			}
+			catch (IOException ex) {
+				System.out.println("Error: " + ex.toString());
+				ex.printStackTrace(System.out);
+				System.out.println("socket == null" + socket == null);
+				System.out.println("socket.isClosed()" + socket.isClosed());
+				System.out.println(address + ':' + port);
+			}
+		}
 	}
 	
 	private ArrayList<DatagramPacket> runSocket(int packetsMax) throws IOException {
@@ -69,6 +115,8 @@ public class ReceiverSocket {
 		do {
 			ArrayList<DatagramPacket> packetsRcvd = runSocket(packetsMax);
 			for (DatagramPacket packetMsg : packetsRcvd) {
+				System.out.println("FIXME: rcvd/xpctd - " + ProtocolMessage.getMessageCode(packetMsg.getData()) +
+						"/" + code);
 				if (ProtocolMessage.getMessageCode(packetMsg.getData()).trim().equals(code.trim())) {
 					toReturn.add(packetMsg);
 				}
@@ -81,6 +129,7 @@ public class ReceiverSocket {
 	ArrayList<DatagramPacket> receiveData(int packetsMax) {
 		//returns the content of all packages read in order.
 		try {
+			socket.setSoTimeout(0);
 			return runSocket(packetsMax);
 		}
 		catch (Exception e) {
@@ -93,6 +142,7 @@ public class ReceiverSocket {
 	//TODO: create struct or class for codes
 	ArrayList<DatagramPacket> receiveData(int packetsMax, String code) {
 		try {
+			socket.setSoTimeout(0);
 			ArrayList<DatagramPacket> toReturn = runSocket(packetsMax, code);
 			return toReturn;
 		}
@@ -106,6 +156,17 @@ public class ReceiverSocket {
 			socket.setSoTimeout(timeout);
 			ArrayList<DatagramPacket> toReturn = runSocket(1, code);
 			return toReturn.get(0);
+		}
+		catch (Exception e) {
+			return null;
+		}
+	}
+	
+	ArrayList<DatagramPacket> receiveData(int packetsMax, int timeout) {
+		try {
+			socket.setSoTimeout(timeout);
+			ArrayList<DatagramPacket> toReturn = runSocket(packetsMax);
+			return toReturn;
 		}
 		catch (Exception e) {
 			return null;

@@ -9,15 +9,18 @@ public class LocalReceiverSocket extends ReceiverSocket {
 	}
 	
 	LocalReceiverSocket(int port) {
-		super(port);
+		super();
+		open(port);
 	}
 	
 	LocalReceiverSocket(String address) {
-		super(address);
+		super();
+		open(address);
 	}
 	
 	LocalReceiverSocket(String address, int port) {
-		super(address, port);
+		super();
+		open(address, port);
 	}
 	
 	void readData(int packetsMax) {
