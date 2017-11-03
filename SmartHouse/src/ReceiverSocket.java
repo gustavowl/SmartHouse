@@ -115,8 +115,10 @@ public class ReceiverSocket {
 		do {
 			ArrayList<DatagramPacket> packetsRcvd = runSocket(packetsMax);
 			for (DatagramPacket packetMsg : packetsRcvd) {
-				System.out.println("FIXME: rcvd/xpctd - " + ProtocolMessage.getMessageCode(packetMsg.getData()) +
-						"/" + code);
+				//FIXME: remove
+				/*System.out.println("FIXME: rcvd/xpctd - " + ProtocolMessage.getMessageCode(packetMsg.getData()) +
+						"/" + code);*/
+				String temp = ProtocolMessage.getMessageCode(packetMsg.getData()).trim(); //FIXME: DELETE
 				if (ProtocolMessage.getMessageCode(packetMsg.getData()).trim().equals(code.trim())) {
 					toReturn.add(packetMsg);
 				}

@@ -160,10 +160,8 @@ public class App {
 				}
 				else {
 					//TODO: send to GUI
-					System.out.println("Size: " + connectedIots.size());
 					System.out.println(ProtocolFacade.runGeneralServerRequest(
 							opt, connectedIots, index, sender, receiver));
-					System.out.println("Size: " + connectedIots.size());
 				}
 				opt++;
 				break;

@@ -2,7 +2,7 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.sql.Time;
-import java.time.LocalTime;
+//import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Set;
 
@@ -128,10 +128,12 @@ public class Protocol {
 	
 	private static void sendMessage(String code, String content, int port, SenderSocket sender) {
 		//broadcast
+		//FIXME: remove
+		/*
 		Set<Thread> threadSet = Thread.getAllStackTraces().keySet();
 		Thread[] threadArray = threadSet.toArray(new Thread[threadSet.size()]);
 		System.out.println(Time.valueOf(LocalTime.now()) + " Broadcast - " + code +
-				" / Threads: " + threadArray.length + printThreads(threadArray));
+				" / Threads: " + threadArray.length + printThreads(threadArray));*/
 		
 		byte[] message = ProtocolMessage.createMessage(code, content);
 		sender.sendData(message, port);
@@ -139,23 +141,24 @@ public class Protocol {
 
 	private static void sendMessage(String code, String content, String address, int port, SenderSocket sender) {
 		//unicast
-		Set<Thread> threadSet = Thread.getAllStackTraces().keySet();
+		//FIXME: remove
+		/*Set<Thread> threadSet = Thread.getAllStackTraces().keySet();
 		Thread[] threadArray = threadSet.toArray(new Thread[threadSet.size()]);
 		System.out.println(Time.valueOf(LocalTime.now()) + " Unicast - " + code +
-				" / Threads: " + threadArray.length + printThreads(threadArray));
+				" / Threads: " + threadArray.length + printThreads(threadArray));*/
 		
 		byte[] message = ProtocolMessage.createMessage(code, content);
 		sender.sendData(message, address, port);
 	}
 	
 	//FIXME: Delete
-	private static String printThreads(Thread[] threadArray) {
+	/*private static String printThreads(Thread[] threadArray) {
 		String ret = "";
 		for (int i = 0; i < threadArray.length; i++) {
 			ret += "| " + threadArray[i].getName();
 		}
 		return ret;
-	}
+	}*/
 	
 	public void confirmDiscoveredIotConnection(InetAddress address, SenderSocket sender) {
 		sendMessage("ADD_IOT", "", address.getHostAddress(), IOT_RECEIVER_PORT, sender);

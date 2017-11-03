@@ -96,9 +96,9 @@ public class ProtocolFacade {
 				if (ProtocolMessage.getMessageCode(msgByte).equals("TIMEOUT")) {
 					return iotTimeout(connectedIots, iotIndex); 
 				}
+				
 				AppIOTDevice iot = connectedIots.remove(iotIndex);
-				System.out.println("TODO: SOMEBODY SAVE ME");
-				return "The device \"" + iot.getName() + "\" was removed from the list of connected devices.";
+				return "The device \"" + iot.getName() + "\" was removed from the list of connected devices";
 				
 			case 1: //"CHCK_UPDT"
 				return "";
@@ -112,8 +112,8 @@ public class ProtocolFacade {
 		AppIOTDevice iot = connectedIots.remove(index);
 		System.out.println("TODO: REMOVE EH O FRESQUE");
 		return "The device " + iot.getName() +
-				" did not respond, Request timeout" +
-				"\nDevice removed from the list of connected devices.";
+				" did not respond. Request timeout." +
+				"\nDevice removed from the list of connected devices";
 	}
 
 	public static boolean isDisconnectRequest(String code) {
