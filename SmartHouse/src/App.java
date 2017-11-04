@@ -78,6 +78,9 @@ public class App {
 			protocol.confirmConnection(iot.getAddress(), sender); //STEP 4
 			connectedIots.add(iot); //STEP 5
 		}
+		for (AppIOTDevice iot : iotsDiscovered) {
+			protocol.denyConnection(iot.getAddress(), sender);
+		}
 		iotsDiscovered.clear();
 		iotsDiscovered = null;
 	}

@@ -70,6 +70,27 @@ public class ReceiverSocket {
 		return toReturn;	
 	}
 	
+	//returns packages received with one of the given codes
+	//e.g. DISCVR_IOT, CONFRM_IOT, and CANICON_ID
+	//TODO: create struct or class for codes
+	private ArrayList<DatagramPacket> runSocket(int packetsMax, final String[] codes) throws IOException {
+		ArrayList<DatagramPacket> toReturn = new ArrayList<DatagramPacket>();
+		do {
+			ArrayList<DatagramPacket> packetsRcvd = runSocket(packetsMax);
+			for (DatagramPacket packetMsg : packetsRcvd) {
+				String msgReceived = ProtocolMessage.getMessageCode(packetMsg.getData()).trim();
+				for (int i = 0; i < codes.length; i++) {
+					if (msgReceived.equals(codes[i])) {
+						toReturn.add(packetMsg);
+						break;
+					}
+				}
+			}
+		} while (toReturn.size() < packetsMax);
+		
+		return toReturn;	
+	}
+	
 	ArrayList<DatagramPacket> receiveData(int packetsMax) {
 		//returns the content of all packages read in order.
 		try {
@@ -99,6 +120,17 @@ public class ReceiverSocket {
 		try {
 			socket.setSoTimeout(timeout);
 			ArrayList<DatagramPacket> toReturn = runSocket(1, code);
+			return toReturn.get(0);
+		}
+		catch (Exception e) {
+			return null;
+		}
+	}
+	
+	DatagramPacket receiveData(final String[] codes, int timeout) {
+		try {
+			socket.setSoTimeout(timeout);
+			ArrayList<DatagramPacket> toReturn = runSocket(1, codes);
 			return toReturn.get(0);
 		}
 		catch (Exception e) {

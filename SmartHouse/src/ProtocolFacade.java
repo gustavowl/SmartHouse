@@ -31,6 +31,10 @@ public class ProtocolFacade {
 		protocol.confirmDiscoveredIotConnection(address, sender);
 	}
 	
+	public void denyConnection(InetAddress address, SenderSocket sender) {
+		protocol.denyDiscoveredIotConnection(address, sender);
+	}
+	
 	public static int getStandardServerReceiverPort() { 
 		return Protocol.SERVER_RECEIVER_PORT;
 	}

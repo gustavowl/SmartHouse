@@ -130,36 +130,14 @@ public class Protocol {
 	
 	private static void sendMessage(String code, String content, int port, SenderSocket sender) {
 		//broadcast
-		//FIXME: remove
-		
-		Set<Thread> threadSet = Thread.getAllStackTraces().keySet();
-		Thread[] threadArray = threadSet.toArray(new Thread[threadSet.size()]);
-		System.out.println(Time.valueOf(LocalTime.now()) + " Broadcast - " + code +
-				" / Threads: " + threadArray.length + printThreads(threadArray));
-		
 		byte[] message = ProtocolMessage.createMessage(code, content);
 		sender.sendData(message, port);
 	}
 
 	private static void sendMessage(String code, String content, String address, int port, SenderSocket sender) {
-		//unicast
-		//FIXME: remove
-		/*Set<Thread> threadSet = Thread.getAllStackTraces().keySet();
-		Thread[] threadArray = threadSet.toArray(new Thread[threadSet.size()]);
-		System.out.println(Time.valueOf(LocalTime.now()) + " Unicast - " + code +
-				" / Threads: " + threadArray.length + printThreads(threadArray));*/
-		
+		//unicast		
 		byte[] message = ProtocolMessage.createMessage(code, content);
 		sender.sendData(message, address, port);
-	}
-	
-	//FIXME: Delete
-	private static String printThreads(Thread[] threadArray) {
-		String ret = "";
-		for (int i = 0; i < threadArray.length; i++) {
-			ret += "| " + threadArray[i].getName();
-		}
-		return ret;
 	}
 	
 	public void confirmDiscoveredIotConnection(InetAddress address, SenderSocket sender) {
@@ -167,13 +145,19 @@ public class Protocol {
 		sendMessage("ADD_IOT", "", address.getHostAddress(), IOT_RECEIVER_PORT, sender);
 		sender.close();
 	}
+	
+	public void denyDiscoveredIotConnection(InetAddress address, SenderSocket sender) {
+		sender.open(SERVER_SENDER_PORT, false);
+		sendMessage("DENY_IOT", "", address.getHostAddress(), IOT_RECEIVER_PORT, sender);
+		sender.close();		
+	}
 
 	public InetSocketAddress discoverServer(ReceiverSocket receiver, SenderSocket sender, String iotId) {
 		/* Protocol outline:
 		 * 1 - Receives packet from the app, trying to discover new devices
 		 * 2 - Sends packet to the app with device ID
 		 * 3 - Receives packet from the app, asking to stop sending connection requests
-		 * 4 - Receives packet from the app confirming connection
+		 * 4 - Receives packet from the app confirming or denying connection
 		 */
 		
 		receiver.open(IOT_RECEIVER_PORT, true);
@@ -191,18 +175,25 @@ public class Protocol {
 					
 					//STEP 3
 					DatagramPacket dataRecvd = receiver.receiveData("CONFRM_IOT", 1000);
+					
 					if (dataRecvd != null) {
-						
 						//STEP 4
 						attempts = 0;
 						while (attempts <= 60) {
-							dataRecvd = receiver.receiveData("ADD_IOT", 1000);
+							dataRecvd = receiver.receiveData(new String[] {"ADD_IOT", "DENY_IOT"}, 1000);
 							if (dataRecvd != null) {
-								receiver.close();
-								sender.close();
-								InetSocketAddress address = new InetSocketAddress(
-										dataFromApp.getAddress(), dataFromApp.getPort());
-								return address;
+								if (ProtocolMessage.getMessageCode(dataRecvd.getData()).equals("ADD_IOT")) {
+									//CONNECTION CONFIRMED
+									receiver.close();
+									sender.close();
+									InetSocketAddress address = new InetSocketAddress(
+											dataFromApp.getAddress(), dataFromApp.getPort());
+									return address;
+								}
+								else { //ProtocolMessage.getMessageCode(dataRecvd.getData()) == "RMV_IOT"
+									//CONNECTION DENIED
+									break;
+								}
 							}
 							attempts++;
 						}
