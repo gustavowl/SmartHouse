@@ -34,7 +34,19 @@ public class IOT_IOTDevice extends IOTDevice {
 	}
 	
 	public void discover() {
-
+		while (true) {
+			InetSocketAddress isa = protocol.ServerDiscoveryStart(receiver,
+					sender, getName());
+			if (isa != null) {
+				setPeerAddress(isa.getAddress());
+				break;
+			}
+			else {
+				//TODO: change to GUI
+				System.out.println("IoT device was not recognized by Server. Timeout.");
+				continue;
+			}
+		}
 	}
 	
 	public void listenToPeer() {
@@ -46,34 +58,24 @@ public class IOT_IOTDevice extends IOTDevice {
 		 * 5 - Check for updates (?)
 		 * 6 - List consumption (?)
 		 */
-		String code = protocol.listenToServerRequests(getPeerAddress(), receiver);
-		protocol.answerServerRequest(code, getPeerAddress(), sender);
-		if (ProtocolFacade.isDisconnectRequest(code)) {
-			peerAddress = null;
-			//TODO: change to GUI
-			System.out.println("Disconnected by the server");
+		while (peerAddress != null) {
+			String code = protocol.listenToServerRequests(getPeerAddress(), receiver);
+			protocol.answerServerRequest(code, getPeerAddress(), sender);
+			if (ProtocolFacade.isDisconnectRequest(code)) {
+				peerAddress = null;
+				//TODO: change to GUI
+				System.out.println("Disconnected by the server");
+			}
 		}
 	}
 	
 	public void run() {
 		while (true) {
 			System.out.println("Wait for server Discovery request");
-			while (true) {
-				InetSocketAddress isa = protocol.ServerDiscoveryStart(receiver,
-						sender, getName());
-				if (isa != null) {
-					setPeerAddress(isa.getAddress());
-					break;
-				}
-				else {
-					System.out.println("IoT device was not recognized by Server. Timeout.");
-					continue;
-				}
-			}
+			discover();
+
 			System.out.println("Listening for server requests");
-			while (peerAddress != null) {
-				listenToPeer();
-			}	
+			listenToPeer();
 		}
 	}
 }
