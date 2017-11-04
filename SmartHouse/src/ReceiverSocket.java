@@ -12,35 +12,6 @@ public class ReceiverSocket {
 		socket = null;
 	}
 	
-	/*ReceiverSocket() {
-		this(12112);
-	}
-	
-	ReceiverSocket(int port) {
-		this("0.0.0.0", port);
-		try {
-			socket.setBroadcast(true);
-		}
-		catch (IOException e) {
-			System.out.println("Error: " + e.toString());
-		}
-	}
-	
-	ReceiverSocket(String address) {
-		this(address, 12112);
-	}
-	
-	ReceiverSocket(String address, int port) {
-		//TODO: verify if port range is valid
-		try {
-			socket = new DatagramSocket(port, InetAddress.getByName(address));
-			
-		}
-		catch (IOException ex) {
-			System.out.println("Error: " + ex.toString());
-		}
-	}*/
-	
 	public void close() {
 		if (socket != null && !socket.isClosed()) {
 			socket.close();
@@ -96,12 +67,7 @@ public class ReceiverSocket {
 			socket.receive(packet);
 			
 	        //Packet received
-			toReturn.add(packet);
-			/* do not print because Single Responsibility
-			System.out.println("-------------------------");
-			System.out.println(getClass().getName() + "Packet received from: " + packet.getAddress().getHostAddress());
-			System.out.println(getClass().getName() + "Data: " + toReturn.get(toReturn.size() - 1)); */
-			
+			toReturn.add(packet);			
 			packetsMax--;
 		}
 		return toReturn;
@@ -115,9 +81,6 @@ public class ReceiverSocket {
 		do {
 			ArrayList<DatagramPacket> packetsRcvd = runSocket(packetsMax);
 			for (DatagramPacket packetMsg : packetsRcvd) {
-				//FIXME: remove
-				/*System.out.println("FIXME: rcvd/xpctd - " + ProtocolMessage.getMessageCode(packetMsg.getData()) +
-						"/" + code);*/
 				String temp = ProtocolMessage.getMessageCode(packetMsg.getData()).trim(); //FIXME: DELETE
 				if (ProtocolMessage.getMessageCode(packetMsg.getData()).trim().equals(code.trim())) {
 					toReturn.add(packetMsg);
@@ -174,6 +137,4 @@ public class ReceiverSocket {
 			return null;
 		}
 	}
-	
-	//TODO: Destructor? Close socket
 }
