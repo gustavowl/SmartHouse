@@ -19,7 +19,7 @@ public class IOT_IOTDevice extends IOTDevice {
 		super(null, port, name);
 		receiver = new ReceiverSocket();
 		//listenerPort = port;
-		sender = new SenderSocket("0.0.0.0", ProtocolFacade.getStandardIotSenderPort());
+		sender = new SenderSocket();
 		setPeerAddress(peerAddress);
 		//setPeerPort(peerPort);
 		protocol = new ProtocolFacade();

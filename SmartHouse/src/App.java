@@ -14,7 +14,7 @@ public class App {
 		scan = new Scanner(System.in);
 		protocol = new ProtocolFacade();
 		receiver = new ReceiverSocket();
-		sender = new SenderSocket(ProtocolFacade.getStandardServerSenderPort());
+		sender = new SenderSocket();
 	}
 	
 	//TODO: extends runnable?

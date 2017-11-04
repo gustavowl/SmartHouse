@@ -2,7 +2,7 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.sql.Time;
-//import java.time.LocalTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Set;
 
@@ -44,8 +44,10 @@ public class Protocol {
 			iotsFound = new ArrayList<IOTDevice>();
 			iotDiscoverer = new ThreadIOTDiscoverer("Discover IOTs", receiver, sender);
 			
-			//STEP 1				
+			//STEP 1
+			sender.open(SERVER_SENDER_PORT, true);
 			sendMessage("DISCVR_IOT", "", IOT_RECEIVER_PORT, sender);
+			sender.close();
 			iotDiscoverer.start(); //STEP 2 and 3
 		}
 		
@@ -94,11 +96,11 @@ public class Protocol {
 		@Override
 		public void run() {
 			//STEP 2
-			this.receiver.open(SERVER_RECEIVER_PORT);
+			this.receiver.open(SERVER_RECEIVER_PORT, true);
 			DatagramPacket dataFromIoT = null;
 			while (!finished) {
 				try {
-					dataFromIoT = receiver.receiveData(1, "CANICON_ID").get(0);
+					dataFromIoT = this.receiver.receiveData(1, "CANICON_ID").get(0);
 				} catch (NullPointerException e) {
 					this.interrupt();
 				}
@@ -109,10 +111,10 @@ public class Protocol {
 						iotsFound.add(iot); //STEP 3
 					}
 
-					synchronized (sender) {
-						Protocol.sendMessage("CONFRM_IOT", "", iot.getAddress().getHostAddress(),
-								IOT_RECEIVER_PORT, sender);
-					}
+					sender.open(SERVER_SENDER_PORT, false);
+					Protocol.sendMessage("CONFRM_IOT", "", iot.getAddress().getHostAddress(),
+							IOT_RECEIVER_PORT, sender);
+					sender.close();
 				}
 			}
 		}
@@ -120,7 +122,7 @@ public class Protocol {
 		@Override
 		public void interrupt() {
 			finished = true;
-			receiver.close();
+			this.receiver.close();
 			thread.interrupt();
 			super.interrupt();
 		}
@@ -129,11 +131,11 @@ public class Protocol {
 	private static void sendMessage(String code, String content, int port, SenderSocket sender) {
 		//broadcast
 		//FIXME: remove
-		/*
+		
 		Set<Thread> threadSet = Thread.getAllStackTraces().keySet();
 		Thread[] threadArray = threadSet.toArray(new Thread[threadSet.size()]);
 		System.out.println(Time.valueOf(LocalTime.now()) + " Broadcast - " + code +
-				" / Threads: " + threadArray.length + printThreads(threadArray));*/
+				" / Threads: " + threadArray.length + printThreads(threadArray));
 		
 		byte[] message = ProtocolMessage.createMessage(code, content);
 		sender.sendData(message, port);
@@ -152,16 +154,18 @@ public class Protocol {
 	}
 	
 	//FIXME: Delete
-	/*private static String printThreads(Thread[] threadArray) {
+	private static String printThreads(Thread[] threadArray) {
 		String ret = "";
 		for (int i = 0; i < threadArray.length; i++) {
 			ret += "| " + threadArray[i].getName();
 		}
 		return ret;
-	}*/
+	}
 	
 	public void confirmDiscoveredIotConnection(InetAddress address, SenderSocket sender) {
+		sender.open(SERVER_SENDER_PORT, false);
 		sendMessage("ADD_IOT", "", address.getHostAddress(), IOT_RECEIVER_PORT, sender);
+		sender.close();
 	}
 
 	public InetSocketAddress discoverServer(ReceiverSocket receiver, SenderSocket sender, String iotId) {
@@ -172,17 +176,18 @@ public class Protocol {
 		 * 4 - Receives packet from the app confirming connection
 		 */
 		
-		receiver.open(IOT_RECEIVER_PORT);
+		receiver.open(IOT_RECEIVER_PORT, true);
 		while (true) {
 			//STEP 1
 			DatagramPacket dataFromApp = receiver.receiveData(1, "DISCVR_IOT").get(0);
+			sender.open(IOT_SENDER_PORT, false);
 			
 			//STEP 2
 			int attempts = 0;
 			while (attempts <= 60) {
 				if (attempts < 60) {
 					sendMessage("CANICON_ID", iotId, dataFromApp.getAddress().getHostAddress(),
-							dataFromApp.getPort() - 1, sender);
+							SERVER_RECEIVER_PORT, sender);
 					
 					//STEP 3
 					DatagramPacket dataRecvd = receiver.receiveData("CONFRM_IOT", 1000);
@@ -194,16 +199,19 @@ public class Protocol {
 							dataRecvd = receiver.receiveData("ADD_IOT", 1000);
 							if (dataRecvd != null) {
 								receiver.close();
+								sender.close();
 								InetSocketAddress address = new InetSocketAddress(
 										dataFromApp.getAddress(), dataFromApp.getPort());
 								return address;
 							}
 							attempts++;
 						}
+						sender.close();
 						break;
 					}
 				}
 				else {
+					sender.close();
 					receiver.close();
 					return null;
 				}
@@ -215,7 +223,7 @@ public class Protocol {
 	public String listenToServerRequests(InetAddress serverAddress, ReceiverSocket receiver) {
 		while (true) {
 			//Listens to server
-			receiver.open(serverAddress.getHostName(), IOT_RECEIVER_PORT);
+			receiver.open(IOT_RECEIVER_PORT, false);
 			ArrayList<DatagramPacket> dpList = receiver.receiveData(1);
 			if (dpList != null) {
 				DatagramPacket dp = dpList.get(0);
@@ -247,10 +255,14 @@ public class Protocol {
 		 * 	   else
 		 * 			return messageFromIotDevice
 		 */
+		sender.open(SERVER_SENDER_PORT, false);
 		sendMessage(VALID_SERVER_REQUESTS[0], "", address.getHostAddress(), IOT_RECEIVER_PORT, sender);
-		receiver.open(address.getHostAddress(), SERVER_RECEIVER_PORT);
+		sender.close();
+		
+		receiver.open(SERVER_RECEIVER_PORT, false);
 		DatagramPacket dp = receiver.receiveData("DSCNCT_SRV", 5000); //FIXME: CHANGE TO 60000
 		receiver.close();
+		
 		if (dp != null) {
 			return dp.getData();
 		}
@@ -259,7 +271,9 @@ public class Protocol {
 	}
 	
 	public static void iotDisconnectFromServer(InetAddress serverAddress, SenderSocket sender) {
+		sender.open(IOT_SENDER_PORT, false);
 		sendMessage("DSCNCT_SRV", "", serverAddress.getHostAddress(), 
 				SERVER_RECEIVER_PORT, sender);
+		sender.close();
 	}
 }

@@ -9,20 +9,18 @@ public class LocalSenderSocket extends SenderSocket {
 	}
 	
 	LocalSenderSocket(int port) {
-		super(port);
+		super();
+		open(port, true);
 		scan = new Scanner(System.in);
 	}
 	
-	LocalSenderSocket(String address) {
-		super(address);
+	LocalSenderSocket(int port, boolean isBroadcast) {
+		super();
+		open(port, isBroadcast);
 		scan = new Scanner(System.in);
 	}
 	
-	LocalSenderSocket(String address, int port) {
-		super(address, port);
-		scan = new Scanner(System.in);
-	}
-	
+	//FIXME: not closing socket
 	void writeAndSendData() {
 		System.out.print("Type destination address: ");
 		String address = scan.next();

@@ -1,6 +1,7 @@
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 public class LocalReceiverSocket extends ReceiverSocket {
 	
@@ -10,17 +11,12 @@ public class LocalReceiverSocket extends ReceiverSocket {
 	
 	LocalReceiverSocket(int port) {
 		super();
-		open(port);
+		open(port, true);
 	}
 	
-	LocalReceiverSocket(String address) {
+	LocalReceiverSocket(int port, boolean isBroadcast) {
 		super();
-		open(address);
-	}
-	
-	LocalReceiverSocket(String address, int port) {
-		super();
-		open(address, port);
+		open(port, isBroadcast);
 	}
 	
 	void readData(int packetsMax) {
@@ -31,6 +27,7 @@ public class LocalReceiverSocket extends ReceiverSocket {
 		printReceivedPackets(super.receiveData(packetsMax, code));
 	}
 	
+	//FIXME: not closing socket
 	void readData(String code, int timeout) {
 		DatagramPacket dp = super.receiveData(code, timeout);
 		ArrayList<DatagramPacket> datagram_list = new ArrayList<DatagramPacket>();

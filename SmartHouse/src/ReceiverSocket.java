@@ -18,41 +18,20 @@ public class ReceiverSocket {
 		}
 	}
 	
-	public void open() {
-		open(12112);
-	}
-	
-	public void open(int port) {
-		open("0.0.0.0", port);
-		if (socket != null) {
-			try {
-				socket.setBroadcast(true);
-			}
-			catch (IOException e) {
-				System.out.println("Error: " + e.toString());
-				e.printStackTrace(System.out);
-			}
-		}
-	}
-	
-	public void open(String address) {
-		open(address, 12112);
-	}
-	
-	public void open(String address, int port) {
+	public void open(int port, boolean isBroadcast) {
 		if (socket == null || socket.isClosed()) {
 			//TODO: verify if port range is valid
 			try {
 				socket = new DatagramSocket(null);
-				socket.bind(new InetSocketAddress(InetAddress.getByName(address), port));
-				socket.setBroadcast(false);
+				socket.bind(new InetSocketAddress(InetAddress.getByName("0.0.0.0"), port));
+				socket.setBroadcast(isBroadcast);
 			}
 			catch (IOException ex) {
 				System.out.println("Error: " + ex.toString());
 				ex.printStackTrace(System.out);
 				System.out.println("socket == null" + socket == null);
 				System.out.println("socket.isClosed()" + socket.isClosed());
-				System.out.println(address + ':' + port);
+				System.out.println(socket.getLocalAddress().getHostAddress() + ':' + port);
 			}
 		}
 	}
