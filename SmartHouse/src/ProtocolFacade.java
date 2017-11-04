@@ -31,9 +31,20 @@ public class ProtocolFacade {
 		protocol.confirmDiscoveredIotConnection(address, sender);
 	}
 	
+	/* Denies connection using unicast only. Does not deny in broadcast because UDP can 
+	 * change the order of the messages. Henceforth, the "CONFIRM_CONNECTION" message 
+	 * may arrive after the "DENY_CONNECTION" message
+	 */
 	public void denyConnection(InetAddress address, SenderSocket sender) {
 		protocol.denyDiscoveredIotConnection(address, sender);
 	}
+	
+	/* Denies connection in broadcast. Not implemented because UDP can change the order
+	 * of the messages. Henceforth, the "CONFIRM_CONNECTION" message may arrive after the
+	 * "DENY_CONNECTION" message
+	public void denyConnection(SenderSocket sender) {
+		protocol.denyDiscoveredIotConnection(sender);
+	}*/
 	
 	public static int getStandardServerReceiverPort() { 
 		return Protocol.SERVER_RECEIVER_PORT;

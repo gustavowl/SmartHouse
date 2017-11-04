@@ -146,6 +146,10 @@ public class Protocol {
 		sender.close();
 	}
 	
+	/* Denies connection using unicast only. Does not deny in broadcast because UDP can 
+	 * change the order of the messages. Henceforth, the "CONFIRM_CONNECTION" message 
+	 * may arrive after the "DENY_CONNECTION" message
+	 */
 	public void denyDiscoveredIotConnection(InetAddress address, SenderSocket sender) {
 		sender.open(SERVER_SENDER_PORT, false);
 		sendMessage("DENY_IOT", "", address.getHostAddress(), IOT_RECEIVER_PORT, sender);
