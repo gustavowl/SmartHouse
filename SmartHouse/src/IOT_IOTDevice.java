@@ -81,4 +81,6 @@ public abstract class IOT_IOTDevice extends IOTDevice {
 	}
 	
 	public abstract ArrayList<String> getFacadeMethods();
+	
+	public abstract void executeFacadeMethod(String methodSignature, String[] args);
 }

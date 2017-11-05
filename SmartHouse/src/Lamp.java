@@ -4,7 +4,7 @@ import java.util.ArrayList;
 public class Lamp extends IOT_IOTDevice {
 	
 	private boolean isLampOn;
-	ArrayList<String> facadeMethods;
+	Method[] facadeMethods;
 	
 	public Lamp() {
 		this("Lamp");
@@ -13,14 +13,15 @@ public class Lamp extends IOT_IOTDevice {
 	public Lamp(String name) {
 		super(name);
 		isLampOn = false;
-		facadeMethods = generateFacadeMethods();
-	}
-	
-	private ArrayList<String> generateFacadeMethods() {
+		
 		Class<? extends Lamp> c = this.getClass();
-		Method[] methods = c.getDeclaredMethods();
+		facadeMethods = c.getDeclaredMethods();
+	}
+
+	@Override
+	public ArrayList<String> getFacadeMethods() {
 		ArrayList<String> list = new ArrayList<String>();
-		for (Method method : methods) {
+		for (Method method : facadeMethods) {
 			String str = method.getName();
 			if (!str.equals("getFacadeMethods")) {
 				list.add(method.getName());
@@ -29,10 +30,30 @@ public class Lamp extends IOT_IOTDevice {
 		}
 		return list;
 	}
-
+	
 	@Override
-	public ArrayList<String> getFacadeMethods() {
-		return facadeMethods;
+	public void executeFacadeMethod(String methodSignature, String[] args) {
+		// TODO Auto-generated method stub
+		Method method = getMethod(methodSignature);
+		if (method != null) {
+			try {
+				method.invoke(this, (Object)args);
+			}
+			catch(Exception e) {
+				System.out.println("Error when trying to execute lamp facade method.\n" +
+						"\tSignature: " + methodSignature + "\n\tArgs: " + args.toString() +
+						"\t" + e.getMessage());
+			}
+		}
+	}
+	
+	private Method getMethod(String methodSignature) {
+		for (Method method : facadeMethods) {
+			if (methodSignature.equals(method.getName())) {
+				return method;
+			}
+		}
+		return null;
 	}
 	
 	public void turnOn() {
