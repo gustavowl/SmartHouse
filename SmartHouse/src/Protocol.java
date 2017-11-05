@@ -171,7 +171,7 @@ public class Protocol {
 			sender.open(IOT_SENDER_PORT, false);
 			
 			//STEP 2
-			int attempts = 0;
+			int attempts = 0; //FIXME: USE sendMessageAndWait
 			while (attempts <= 60) {
 				if (attempts < 60) {
 					sendMessage("CANICON_ID", iotId, dataFromApp.getAddress().getHostAddress(),
@@ -297,10 +297,14 @@ public class Protocol {
 				if (! sendMessageAndWait("IOTFUNCSNT", iotFacadeMethods.get(i), serverAddress.getHostAddress(),
 						SERVER_RECEIVER_PORT, 60, sender, "IOTFUNCRCV", receiver)) {
 					//STEP 5
+					sender.close();
+					receiver.close();
 					return;
 				}
 			}
 		}
+		sender.close();
+		receiver.close();
 		//STEP 5
 	}
 	
