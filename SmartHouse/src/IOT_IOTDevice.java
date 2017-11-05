@@ -1,8 +1,9 @@
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.util.ArrayList;
 
 //IOTDevice representation as seen by the IOT itself
-public class IOT_IOTDevice extends IOTDevice {
+public abstract class IOT_IOTDevice extends IOTDevice {
 	ReceiverSocket receiver;
 	SenderSocket sender;
 	ProtocolFacade protocol;
@@ -60,7 +61,7 @@ public class IOT_IOTDevice extends IOTDevice {
 		 */
 		while (peerAddress != null) {
 			String code = protocol.listenToServerRequests(getPeerAddress(), receiver);
-			protocol.answerServerRequest(code, getPeerAddress(), sender);
+			protocol.answerServerRequest(code, getPeerAddress(), receiver, sender, getFacadeMethods());
 			if (ProtocolFacade.isDisconnectRequest(code)) {
 				peerAddress = null;
 				//TODO: change to GUI
@@ -78,4 +79,6 @@ public class IOT_IOTDevice extends IOTDevice {
 			listenToPeer();
 		}
 	}
+	
+	public abstract ArrayList<String> getFacadeMethods();
 }

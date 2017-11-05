@@ -271,4 +271,52 @@ public class Protocol {
 				SERVER_RECEIVER_PORT, sender);
 		sender.close();
 	}
+	
+	public static void iotSendFunctionalitiesToServer(InetAddress serverAddress, ReceiverSocket receiver,
+			SenderSocket sender, ArrayList<String> iotFacadeMethods) {
+		/* PROTOCOL OUTLINE
+		 * 1 - Send Message to server and waits for connection confirmation
+		 * 2 - Foreach method
+		 * 3 - 		Send method to server
+		 * 4 - 		wait for server confirmation. If necessary, resend
+		 * 
+		 * 5 - Whenever method was resent for a specific number of times, connection was lost. Return
+		 */
+		sender.open(IOT_SENDER_PORT, false);
+		receiver.open(IOT_RECEIVER_PORT, false);
+		
+		//STEP 1
+		//IOT FUNCTION BEGIN | IOT SEND START
+		if (sendMessageAndWait("IOTFUNCBGN", new Integer(iotFacadeMethods.size()).toString(),
+				serverAddress.getHostAddress(), SERVER_RECEIVER_PORT, 60, sender, "IOTSNDSTRT", receiver)) {
+			
+			//STEP 2
+			for (int i = 0; i < iotFacadeMethods.size(); i++) {
+				//STEP 3 and 4
+				//IOT FUNCTION SENT | IOT FUNCTION RECEIVED
+				if (! sendMessageAndWait("IOTFUNCSNT", iotFacadeMethods.get(i), serverAddress.getHostAddress(),
+						SERVER_RECEIVER_PORT, 60, sender, "IOTFUNCRCV", receiver)) {
+					//STEP 5
+					return;
+				}
+			}
+		}
+		//STEP 5
+	}
+	
+	//Returns true if message was received
+	private static boolean sendMessageAndWait(final String msgCode, final String msgContent, 
+			final String address, final int port, final int MAX_ATTEMPTS, final SenderSocket sender,
+			final String confirmationCode, final ReceiverSocket receiver) {
+		int attempts = 0;
+		while (attempts < MAX_ATTEMPTS) {
+			//IOT FUNCTION SENT
+			sendMessage(msgCode, msgContent, address, port, sender);
+			if (receiver.receiveData(confirmationCode, 1000) != null) {
+				return true;
+			}
+			attempts++;
+		}
+		return false;
+	}
 }

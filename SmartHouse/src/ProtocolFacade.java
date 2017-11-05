@@ -70,7 +70,8 @@ public class ProtocolFacade {
 		return code; 
 	}
 	
-	public void answerServerRequest(String code, InetAddress serverAddress, SenderSocket sender) {
+	public void answerServerRequest(String code, InetAddress serverAddress, ReceiverSocket receiver, 
+			SenderSocket sender, ArrayList<String> iotFacadeMethods) {
 		int opt = -1;
 		for (int i = 0; i < Protocol.VALID_SERVER_REQUESTS.length; i++) {
 			if (code.equals(Protocol.VALID_SERVER_REQUESTS[i])) {
@@ -86,6 +87,10 @@ public class ProtocolFacade {
 			case 1: //"CHCK_UPDT"
 				break;
 			case 2: //"UPDATE"
+				break;
+			case 3: //"GETFUNCLST"
+				System.out.println("SENDING IOT FUNCTIONALITIES TO SERVER");
+				Protocol.iotSendFunctionalitiesToServer(serverAddress, receiver, sender, iotFacadeMethods);
 				break;
 		}
 	}

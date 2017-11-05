@@ -149,9 +149,11 @@ public class App {
 			//TODO: Transfer to GUI
 			//prints requests
 			String[] options = ProtocolFacade.getValidServerRequestsDescriptions();
-			for (int i = 0; i < options.length; i++) {
+			int i = 0;
+			for (; i < options.length; i++) {
 				System.out.println((i + 1) + " - " + options[i]);
 			}
+			//ArrayList<String> methods = connectedIots.get(index).g
 			
 			//reads and validates option
 			opt = scan.nextInt();

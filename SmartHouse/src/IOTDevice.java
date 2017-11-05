@@ -7,7 +7,7 @@ abstract public class IOTDevice {
 	//protected int listenerPort;
 	protected InetAddress peerAddress;
 	//protected int peerPort;
-	protected ArrayList<Method> methods;
+	//protected ArrayList<Method> methods;
 	protected String name;
 	
 	protected IOTDevice() {
@@ -30,9 +30,9 @@ abstract public class IOTDevice {
 		this.name = name;
 		this.peerAddress = null;
 		//this.peerPort = 0;
-		methods = new ArrayList<Method>();
+		/*methods = new ArrayList<Method>();
 		methods.add(new Method("update"));
-		methods.add(new Method("remove"));
+		methods.add(new Method("remove"));*/
 	}
 	
 	public void setPeerAddress(InetAddress peerAddress) {
@@ -60,9 +60,9 @@ abstract public class IOTDevice {
 		return peerPort;
 	}*/
 	
-	public ArrayList<Method> getMethods() {
+	/*public ArrayList<Method> getMethods() {
 		return methods;
-	}
+	}*/
 	
 	public String getName() {
 		return name;

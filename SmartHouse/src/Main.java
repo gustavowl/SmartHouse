@@ -18,9 +18,11 @@ public class Main {
 				app.run();
 				break;
 			case 2:
-				IOT_IOTDevice iotDevice = new IOT_IOTDevice("Digivice");
-				System.out.println("Starts running IoT \"" + iotDevice.getName() + "\"");
-				iotDevice.run();
+				//IOT_IOTDevice iotDevice = new IOT_IOTDevice("Digivice");
+				Lamp lamp = new Lamp();
+				//lamp.getFacadeMethods();
+				System.out.println("Starts running IoT \"" + lamp.getName() + "\"");
+				lamp.run();
 				break;
 			default: 
 				System.out.println("Invalid input");
