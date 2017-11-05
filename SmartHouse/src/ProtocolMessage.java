@@ -22,4 +22,8 @@ public final class ProtocolMessage {
 		int index = messageStr.indexOf(SEPARATOR);
 		return messageStr.substring(index + 1).trim();		
 	}
+	
+	public static String getSeparator() {
+		return SEPARATOR;
+	}
 }

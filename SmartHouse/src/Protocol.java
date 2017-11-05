@@ -288,14 +288,15 @@ public class Protocol {
 		//STEP 1
 		//IOT FUNCTION BEGIN | IOT SEND START
 		if (sendMessageAndWait("IOTFUNCBGN", new Integer(iotFacadeMethods.size()).toString(),
-				serverAddress.getHostAddress(), SERVER_RECEIVER_PORT, 60, sender, "IOTSNDSTRT", receiver)) {
+				serverAddress.getHostAddress(), SERVER_RECEIVER_PORT, 60, sender, "IOTSNDSTRT",
+				receiver) != null) {
 			
 			//STEP 2
 			for (int i = 0; i < iotFacadeMethods.size(); i++) {
 				//STEP 3 and 4
 				//IOT FUNCTION SENT | IOT FUNCTION RECEIVED
-				if (! sendMessageAndWait("IOTFUNCSNT", iotFacadeMethods.get(i), serverAddress.getHostAddress(),
-						SERVER_RECEIVER_PORT, 60, sender, "IOTFUNCRCV", receiver)) {
+				if (sendMessageAndWait("IOTFNCSNT" + i, iotFacadeMethods.get(i), serverAddress.getHostAddress(),
+						SERVER_RECEIVER_PORT, 60, sender, "IOTFNCRCV" + i, receiver) == null) {
 					//STEP 5
 					sender.close();
 					receiver.close();
@@ -308,19 +309,80 @@ public class Protocol {
 		//STEP 5
 	}
 	
-	//Returns true if message was received
-	private static boolean sendMessageAndWait(final String msgCode, final String msgContent, 
+	//Returns null if timeout
+	//Return the ENTIRE content of the package otherwise (alongside with the code)
+	private static byte[] sendMessageAndWait(final String msgCode, final String msgContent, 
 			final String address, final int port, final int MAX_ATTEMPTS, final SenderSocket sender,
 			final String confirmationCode, final ReceiverSocket receiver) {
 		int attempts = 0;
 		while (attempts < MAX_ATTEMPTS) {
 			//IOT FUNCTION SENT
 			sendMessage(msgCode, msgContent, address, port, sender);
-			if (receiver.receiveData(confirmationCode, 1000) != null) {
-				return true;
+			DatagramPacket dp = receiver.receiveData(confirmationCode, 1000); 
+			if (dp != null) {
+				return dp.getData();
 			}
 			attempts++;
 		}
-		return false;
+		return null;
+	}
+	
+	public static byte[] serverRequestIotFunctionalities(InetAddress iotAddress, ReceiverSocket receiver,
+			SenderSocket sender) {
+		/* PROTOCOL OUTLINE
+		 * 1 - Sends message to iot requesting lists
+		 * 2 - Wait message from iot and sends connection confirmation
+		 * 3 - foreach method
+		 * 4 - 		wait for message from iot
+		 * 5 - 		sends server confirmation
+		 * 
+		 * 6 - Whenever confirmation was resent for a specific number of times, connection was lost. Return
+		 */
+		
+		//TODO: detect if size of package is too big. Return ArrayList<byte[]>?
+		
+		//STEP 1 and beginning of STEP 2
+		//GET FUNCTIONALITIES LIST | IOT FUNCTION BEGIN
+		sender.open(SERVER_SENDER_PORT, false);
+		receiver.open(SERVER_RECEIVER_PORT, false);
+		byte[] msgReceived;
+
+		msgReceived = sendMessageAndWait("GETFUNCLST", "", iotAddress.getHostAddress(),
+				IOT_RECEIVER_PORT, 60, sender, "IOTFUNCBGN", receiver); 
+
+		if (msgReceived != null) {
+			int qttPackets = Integer.parseInt(ProtocolMessage.getMessageContent(msgReceived));
+			
+			//STEP 2  (ending) and STEP 3 (beginning)
+			msgReceived = sendMessageAndWait("IOTSNDSTRT", "", iotAddress.getHostAddress(),
+					IOT_RECEIVER_PORT, 60, sender, "IOTFNCSNT0", receiver); 
+			if (msgReceived != null) {
+				//STEP 3 and 4
+				int i = 1;
+				String ret = ProtocolMessage.getMessageContent(msgReceived);
+				while(i < qttPackets) {
+					msgReceived = sendMessageAndWait("IOTFNCRCV" + (i - 1), "", iotAddress.getHostAddress(),
+							IOT_RECEIVER_PORT, 60, sender, "IOTFNCSNT" + i, receiver); 
+					if (msgReceived != null) {
+						ret += ProtocolMessage.getSeparator() + ProtocolMessage.getMessageContent(msgReceived);
+						i++;
+					}
+					else {
+						sender.close();
+						receiver.close();
+						return ProtocolMessage.createMessage("TIMEOUT", "");
+					}
+				}
+				sendMessage("IOTFNCRCV" + (i - 1), "", iotAddress.getHostAddress(),
+						IOT_RECEIVER_PORT, sender);
+				sender.close();
+				receiver.close();
+				return ProtocolMessage.createMessage("IRRELEVANT", ret);
+			}			
+		}
+		
+		sender.close();
+		receiver.close();
+		return ProtocolMessage.createMessage("TIMEOUT", "");
 	}
 }

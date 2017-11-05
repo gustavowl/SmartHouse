@@ -143,9 +143,9 @@ public class App {
 	//@returns true if "quit/return" option selected
 	//@returns false if operation involving iot was selected
 	private boolean listSelectIotOptions(int index) {
-		boolean isOptionInvalid = true;
+		boolean finish = false;
 		int opt = 0;
-		while (isOptionInvalid) {
+		while (!finish) {
 			//TODO: Transfer to GUI
 			//prints requests
 			String[] options = ProtocolFacade.getValidServerRequestsDescriptions();
@@ -153,15 +153,13 @@ public class App {
 			for (; i < options.length; i++) {
 				System.out.println((i + 1) + " - " + options[i]);
 			}
-			//ArrayList<String> methods = connectedIots.get(index).g
 			
 			//reads and validates option
 			opt = scan.nextInt();
 			if (opt > 0 && opt <= options.length) {
 				opt--;
 				if (ProtocolFacade.isGetDevicesFunctionalities(opt)) {
-					//TODO: print list of available options
-					System.out.println("TODO: print list of available options");
+					listSelectIotFunctionalities(opt, index);
 				}
 				else {
 					//TODO: send to GUI
@@ -169,14 +167,24 @@ public class App {
 							opt, connectedIots, index, sender, receiver));
 				}
 				opt++;
-				break;
+				finish = true;
 			}
 			else if (opt == 0) {
 				//isOptionInvalid = false;
-				break;
+				finish = true;
 			}
 			System.out.println("Please enter a valid option\n-----------------");
 		}
 		return opt == 0;
+	}
+	
+	private void listSelectIotFunctionalities(int codeIndex, int index) {
+		String iotFunctionalitiesStr = ProtocolFacade.runGeneralServerRequest(codeIndex, connectedIots,
+				index, sender, receiver);
+		System.out.println(iotFunctionalitiesStr);
+		//TODO: select functionality to be executed
+		System.out.println("TODO: select functionality to be executed");
+		//TODO: execute device functionality
+		System.out.println("TODO: execute device functionality");
 	}
 }

@@ -103,7 +103,7 @@ public class ProtocolFacade {
 		return index == 3;
 	}
 	
-	//disconnect, update, check for updates
+	//disconnect, update, check for updates and Get list of device's specific functionalities
 	public static String runGeneralServerRequest(int requestIndex, ArrayList<AppIOTDevice> 
 		connectedIots, int iotIndex, SenderSocket sender, ReceiverSocket receiver) {
 		
@@ -123,6 +123,15 @@ public class ProtocolFacade {
 				return "";
 			case 2: //"UPDATE"
 				return "";
+			case 3: //"GETFUNCLST"
+				msgByte = Protocol.serverRequestIotFunctionalities(connectedIots.get(iotIndex).getAddress(),
+						receiver, sender);
+				
+				if (ProtocolMessage.getMessageCode(msgByte).equals("TIMEOUT")) {
+					return iotTimeout(connectedIots, iotIndex); 
+				}
+				
+				return ProtocolMessage.getMessageContent(msgByte);
 		}
 		return "Not a general server request.";
 	}

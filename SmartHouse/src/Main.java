@@ -20,7 +20,10 @@ public class Main {
 			case 2:
 				//IOT_IOTDevice iotDevice = new IOT_IOTDevice("Digivice");
 				Lamp lamp = new Lamp();
-				//lamp.getFacadeMethods();
+				/*for (String method : lamp.getFacadeMethods()) {
+					System.out.println(method);
+					lamp.executeFacadeMethod(method, new String[] {});
+				}*/
 				System.out.println("Starts running IoT \"" + lamp.getName() + "\"");
 				lamp.run();
 				break;
