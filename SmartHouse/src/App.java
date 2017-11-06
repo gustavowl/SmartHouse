@@ -144,9 +144,8 @@ public class App {
 	//@returns true if "quit/return" option selected
 	//@returns false if operation involving iot was selected
 	private boolean listSelectIotOptions(int index) {
-		boolean finish = false;
 		int opt = 0;
-		while (!finish) {
+		while (true) {
 			//TODO: Transfer to GUI
 			//prints requests
 			String[] options = ProtocolFacade.getValidServerRequestsDescriptions();
@@ -168,13 +167,14 @@ public class App {
 							opt, connectedIots, index, sender, receiver));
 				}
 				opt++;
-				finish = true;
+				break;
 			}
 			else if (opt == 0) {
 				//isOptionInvalid = false;
-				finish = true;
+				break;
 			}
 			System.out.println("Please enter a valid option\n-----------------");
+			
 		}
 		return opt == 0;
 	}

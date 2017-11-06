@@ -1,20 +1,19 @@
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 
-public class Lamp extends IOT_IOTDevice {
+public class Digivice extends IOT_IOTDevice {
 	
-	private boolean isLampOn;
+	private int form;
+	private String[] evolutions;
 	Method[] facadeMethods;
 	
-	public Lamp() {
-		this("Lamp");
-	}
-	
-	public Lamp(String name) {
-		super(name);
-		isLampOn = false;
+	public Digivice() {
+		super("Digivice");
 		
-		Class<? extends Lamp> c = this.getClass();
+		form = 0;
+		evolutions = new String[]{"Agumon", "Greymon", "MetalGreymon", "WarGreymon"};
+		
+		Class<? extends Digivice> c = this.getClass();
 		facadeMethods = c.getDeclaredMethods();
 		ArrayList<Method> methods = new ArrayList<Method>();
 		for (Method method : c.getDeclaredMethods()) {
@@ -63,17 +62,25 @@ public class Lamp extends IOT_IOTDevice {
 		return null;
 	}
 	
-	public void turnOn() {
-		isLampOn = true;
-		System.out.println("Lamp is on");
+	public void showActualForm() {
+		System.out.println("My actual form is: " + evolutions[form]);
 	}
 	
-	public void turnOff() {
-		isLampOn = false;
-		System.out.println("Lamp is off");
+	public void digivolve() {
+		if (form < evolutions.length - 1) {
+			System.out.println(evolutions[form] + " digivolves to " + evolutions[++form]);
+		}
+		else {
+			System.out.println("I'm already at my strongest form!");
+		}
 	}
 	
-	public boolean getLampState() {
-		return isLampOn;
+	public void unDigivolve() {
+		if (form > 0) {
+			System.out.println(evolutions[form--] + " undigivolves back to " + evolutions[form]);
+		}
+		else {
+			System.out.println("I'm already at my weakest form!");
+		}
 	}
 }

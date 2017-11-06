@@ -9,7 +9,8 @@ public class Main {
 		 * One for sending packages to all devices to be discovered
 		 * one for receiving packages from these devices
 		 */
-		System.out.println("Choose your option:\n1 - App/Server\n2 - IoT Device");
+		System.out.println("Choose your option:\n1 - App/Server\n2 - Lamp" +
+				"\n3 - Digivice");
 		Scanner scan = new Scanner(System.in);
 		int opt = scan.nextInt();
 		switch (opt) {
@@ -27,6 +28,10 @@ public class Main {
 				System.out.println("Starts running IoT \"" + lamp.getName() + "\"");
 				lamp.run();
 				break;
+			case 3:
+				Digivice digivice = new Digivice();
+				System.out.println("Starts running IoT \"" + digivice.getName() + "\"");
+				digivice.run();
 			default: 
 				System.out.println("Invalid input");
 				break;
