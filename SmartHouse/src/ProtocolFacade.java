@@ -62,12 +62,12 @@ public class ProtocolFacade {
 		return Protocol.IOT_SENDER_PORT;
 	}
 
-	public String listenToServerRequests(InetAddress serverAddress, ReceiverSocket receiver) {
-		String code = null;
-		while (code == null) {
-			code = protocol.listenToServerRequests(serverAddress, receiver);
+	public byte[] listenToServerRequests(InetAddress serverAddress, ReceiverSocket receiver) {
+		byte[] msg = null;
+		while (msg == null) {
+			msg = protocol.listenToServerRequests(serverAddress, receiver);  
 		}
-		return code; 
+		return msg; 
 	}
 	
 	public void answerServerRequest(String code, InetAddress serverAddress, ReceiverSocket receiver, 
@@ -90,8 +90,12 @@ public class ProtocolFacade {
 				break;
 			case 3: //"GETFUNCLST"
 				System.out.println("SENDING IOT FUNCTIONALITIES TO SERVER");
-				Protocol.iotSendFunctionalitiesToServer(serverAddress, receiver, sender, iotFacadeMethods);
+				Protocol.iotSendFunctionalitiesToServer(serverAddress, receiver,
+						sender, iotFacadeMethods);
 				break;
+			case 4: //"RUNIOTFUNC"
+				System.out.println("Functionality operation received by iot");
+				Protocol.iotSendRunFunctionalityRequestReceived(serverAddress, sender);
 		}
 	}
 	
@@ -136,6 +140,19 @@ public class ProtocolFacade {
 		return "Not a general server request.";
 	}
 	
+	public static String runSpecificIotFunctionality(ArrayList<AppIOTDevice> connectedIots, int iotIndex,
+			SenderSocket sender, ReceiverSocket receiver, String methodSignature) {
+		
+		byte[] msgByte = Protocol.serverRequestRunningIotFunctionality(methodSignature, 
+				connectedIots.get(iotIndex).getAddress(), receiver, sender);
+		
+		if (ProtocolMessage.getMessageCode(msgByte).equals("TIMEOUT")) {
+			return iotTimeout(connectedIots, iotIndex);
+		}
+		
+		return ProtocolMessage.getMessageContent(msgByte);
+	}
+	
 	private static String iotTimeout(ArrayList<AppIOTDevice> connectedIots, int index) {
 		AppIOTDevice iot = connectedIots.remove(index);
 		System.out.println("TODO: REMOVE EH O FRESQUE");
@@ -146,5 +163,9 @@ public class ProtocolFacade {
 
 	public static boolean isDisconnectRequest(String code) {
 		return code.equals(Protocol.VALID_SERVER_REQUESTS[0]);
+	}
+	
+	public static boolean isRunDeviceFunctionality(String code) {
+		return code.equals(Protocol.VALID_SERVER_REQUESTS[4]);
 	}
 }

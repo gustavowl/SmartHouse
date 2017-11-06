@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.regex.Pattern;
 
 public class App {
 	ArrayList<AppIOTDevice> connectedIots;
@@ -179,12 +180,34 @@ public class App {
 	}
 	
 	private void listSelectIotFunctionalities(int codeIndex, int index) {
+		int iotsConnectedSize = connectedIots.size();
 		String iotFunctionalitiesStr = ProtocolFacade.runGeneralServerRequest(codeIndex, connectedIots,
 				index, sender, receiver);
-		System.out.println(iotFunctionalitiesStr);
-		//TODO: select functionality to be executed
-		System.out.println("TODO: select functionality to be executed");
-		//TODO: execute device functionality
-		System.out.println("TODO: execute device functionality");
+		if (iotsConnectedSize == connectedIots.size()) {
+			String[] iotFunctionalities = iotFunctionalitiesStr.split(
+					Pattern.quote(ProtocolMessage.getSeparator()));
+			boolean finished = false;
+			
+			while (!finished) {
+				//Print options
+				System.out.println("0 - Quit");
+				for (int i = 0; i < iotFunctionalities.length; i++) {
+					System.out.println((i + 1) + " - " + iotFunctionalities[i]);
+				}
+				
+				int opt = scan.nextInt();
+				if (opt >= 0 && opt <= iotFunctionalities.length) {
+					finished = true;
+					System.out.println(ProtocolFacade.runSpecificIotFunctionality(connectedIots,
+							index, sender, receiver, iotFunctionalities[opt - 1]));
+					break;
+				}
+				System.out.println("\"" + opt + "\" is an invalid option");
+			}
+		}
+		else {
+			//TIMEOUT MESSAGE RECEIVED
+			System.out.println(iotFunctionalitiesStr);
+		}
 	}
 }

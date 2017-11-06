@@ -1,10 +1,7 @@
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.sql.Time;
-import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Set;
 
 
 public class Protocol {
@@ -215,7 +212,7 @@ public class Protocol {
 		}
 	}
 	
-	public String listenToServerRequests(InetAddress serverAddress, ReceiverSocket receiver) {
+	public byte[] listenToServerRequests(InetAddress serverAddress, ReceiverSocket receiver) {
 		while (true) {
 			//Listens to server
 			receiver.open(IOT_RECEIVER_PORT, false);
@@ -224,7 +221,7 @@ public class Protocol {
 				DatagramPacket dp = dpList.get(0);
 				String code = ProtocolMessage.getMessageCode(dp.getData());
 				if (isServerRequestValid(code)) {
-					return code;
+					return dp.getData();
 				}
 			}
 			receiver.close();
@@ -384,5 +381,27 @@ public class Protocol {
 		sender.close();
 		receiver.close();
 		return ProtocolMessage.createMessage("TIMEOUT", "");
+	}
+	
+	public static byte[] serverRequestRunningIotFunctionality(String methodSignature, InetAddress iotAddress,
+			ReceiverSocket receiver, SenderSocket sender) {
+		
+		receiver.open(SERVER_RECEIVER_PORT, false);
+		sender.open(SERVER_SENDER_PORT, false);
+		//RUN IOT ESPECIFIC FUNCTIONALITY | RUN IOT FUNCTIONALITY REQUEST RECEIVED
+		byte[] result = sendMessageAndWait("RUNIOTFUNC", methodSignature, iotAddress.getHostAddress(), IOT_RECEIVER_PORT,
+				60, sender, "IOTFUNCRCV", receiver);
+		receiver.close();
+		sender.close();
+		if (result != null) {
+			return result;
+		}
+		return ProtocolMessage.createMessage("TIMEOUT", "");
+	}
+	
+	public static void iotSendRunFunctionalityRequestReceived(InetAddress serverAddress, SenderSocket sender) {
+		sender.open(IOT_SENDER_PORT, false);
+		sendMessage("IOTFUNCRCV", "", serverAddress.getHostAddress(), SERVER_RECEIVER_PORT, sender);
+		sender.close();
 	}
 }

@@ -60,12 +60,19 @@ public abstract class IOT_IOTDevice extends IOTDevice {
 		 * 6 - List consumption (?)
 		 */
 		while (peerAddress != null) {
-			String code = protocol.listenToServerRequests(getPeerAddress(), receiver);
+			byte[] message = protocol.listenToServerRequests(getPeerAddress(), receiver);
+			String code = ProtocolMessage.getMessageCode(message);
 			protocol.answerServerRequest(code, getPeerAddress(), receiver, sender, getFacadeMethods());
 			if (ProtocolFacade.isDisconnectRequest(code)) {
 				peerAddress = null;
 				//TODO: change to GUI
 				System.out.println("Disconnected by the server");
+			}
+			else if (ProtocolFacade.isRunDeviceFunctionality(code)) {
+				//run method
+				String content = ProtocolMessage.getMessageContent(message);
+				this.executeFacadeMethod(content, new String[] {});
+				//run this
 			}
 		}
 	}
