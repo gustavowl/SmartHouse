@@ -81,7 +81,7 @@ public class ProtocolFacade {
 		}
 		switch (opt) {
 			case 0: //"DSCNCT_IOT"
-				System.out.println("IOT DISCONNECT FROM SERVER");
+				//System.out.println("IOT DISCONNECT FROM SERVER");
 				Protocol.iotDisconnectFromServer(serverAddress, sender);
 				break;
 			case 1: //"CHCK_UPDT"
@@ -89,17 +89,18 @@ public class ProtocolFacade {
 			case 2: //"UPDATE"
 				break;
 			case 3: //GET_STATUS
-				System.out.println("SENDING IOT STATUS TO SERVER");
+				//System.out.println("SENDING IOT STATUS TO SERVER");
 				Protocol.iotSendStatus(message, serverAddress, sender);
 				break;
 			case 4: //"GETFUNCLST"
-				System.out.println("SENDING IOT FUNCTIONALITIES TO SERVER");
+				//System.out.println("SENDING IOT FUNCTIONALITIES TO SERVER");
 				Protocol.iotSendFunctionalitiesToServer(serverAddress, receiver,
 						sender, iotFacadeMethods);
 				break;
 			case 5: //"RUNIOTFUNC"
-				System.out.println("Functionality operation received by iot");
+				//System.out.println("Functionality operation received by iot");
 				Protocol.iotSendRunFunctionalityRequestReceived(serverAddress, sender);
+				break;
 		}
 	}
 	
@@ -169,7 +170,6 @@ public class ProtocolFacade {
 	
 	private static String iotTimeout(ArrayList<AppIOTDevice> connectedIots, int index) {
 		AppIOTDevice iot = connectedIots.remove(index);
-		System.out.println("TODO: REMOVE EH O FRESQUE");
 		return "The device " + iot.getName() +
 				" did not respond. Request timeout." +
 				"\nDevice removed from the list of connected devices";
