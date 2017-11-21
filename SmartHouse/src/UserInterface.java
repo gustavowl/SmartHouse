@@ -43,10 +43,10 @@ public abstract class UserInterface {
 	protected abstract int readOption();
 	
 	protected int readOptionUntilValid() {
-		return readOptionUntilValid("Error: Invalid option selected. Rechoice!");
+		return readOptionUntilValid("Invalid option selected. Rechoice!");
 	}
 	
-	protected int readOptionUntilValid(String message) {
+	protected int readOptionUntilValid(String errorMessage) {
 		int opt;
 		while (true) {
 			opt = readOption();
@@ -55,11 +55,13 @@ public abstract class UserInterface {
 				return opt;
 			}
 			
-			showErrorMessage(message);
+			showErrorMessage(errorMessage);
 		}
 	}
 	
-	protected abstract void showErrorMessage(String message);
+	protected abstract void showMessage(String message);
+	
+	protected abstract void showErrorMessage(String errorMessage);
 	
 	protected abstract boolean executeInitialOption(int option);
 	
@@ -93,4 +95,56 @@ public abstract class UserInterface {
 	//runs specific options if necessary. Returns the index of
 	//selected iot if that's the case or -1 otherwise
 	protected abstract int executeDiscoveryOption(int option);
+	
+	protected void listSelectedIots() {
+		showListSelectedIotsOptions(app.getConnectedIots());
+		
+		int opt = readOptionUntilValid();
+		opt = executeListSelectedIotsOption(opt);
+		
+		if (opt != -1) {
+			listIotStandardFunctionalities(opt);
+		}
+		setOptionRangeInvalid();
+	}
+	
+	protected abstract void showListSelectedIotsOptions(String[] connectedIots);
+	
+	//runs specific options if necessary. Returns the index of
+	//selected iot if that's the case or -1 otherwise
+	protected abstract int executeListSelectedIotsOption(int option);
+	
+	protected void listIotStandardFunctionalities(int iotIndex) {
+		showListIotStandardFunctionalities(app.listSelectIotOptions());
+		
+		int opt = readOptionUntilValid();
+		opt = executeListIotStandardFunctionalities(opt);
+		
+		if (opt != -1) {
+			app.executeIotStandardFunctionality(iotIndex, opt);
+		}
+		setOptionRangeInvalid();
+	}
+	
+	protected abstract void showListIotStandardFunctionalities(String[] functionalities);
+	
+	//runs specific options if necessary. Returns the index of
+	//selected option if that's the case or -1 otherwise
+	protected abstract int executeListIotStandardFunctionalities(int option);
+	
+	//Returns the index of selected specific functionality.
+	//Returns -1 if the option selected was not a functionality (i.e. UI inner option)
+	public int listIotSpecificFunctionalities(String[] functionalities) {
+		showIotSpecificFunctionalities(functionalities);
+		
+		int opt = readOptionUntilValid();
+		opt = executeListIotSpecificFunctionality(opt);
+		
+		setOptionRangeInvalid();
+		return opt;
+	}
+	
+	protected abstract void showIotSpecificFunctionalities(String[] functionalities);
+	
+	protected abstract int executeListIotSpecificFunctionality(int option);
 }

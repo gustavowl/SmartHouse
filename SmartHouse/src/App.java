@@ -85,65 +85,27 @@ public class App {
 		}
 	}
 	
-	public void selectIOT() {
-		boolean finish = false;
-		while (!finish) {
-			//TODO: Transfer to GUI
-			System.out.println("Select an IOT from the following list:\n0 - Quit");
-			int opt = 1;
-			for (AppIOTDevice iot : connectedIots) {
-				System.out.println(Integer.toString(opt) + " - " + iot.getName());
-			}
-			
-			opt = scan.nextInt();
-			if (opt > 0 && opt <= connectedIots.size()) {
-				finish = listSelectIotOptions(opt - 1);
-			}
-			else if (opt == 0) {
-				finish = true;
-			}
-			else {
-				System.out.println("Please enter a valid option\n-----------------");
-			}
+	public String[] getConnectedIots() {
+		String[] connIotsNames = new String[connectedIots.size()];
+		for (int i = 0; i < connIotsNames.length; i++) {
+			connIotsNames[i] = connectedIots.get(i).getName();
 		}
+		return connIotsNames;
 	}
 	
-	//@returns true if "quit/return" option selected
-	//@returns false if operation involving iot was selected
-	private boolean listSelectIotOptions(int index) {
-		int opt = 0;
-		while (true) {
-			//TODO: Transfer to GUI
-			//prints requests
-			String[] options = ProtocolFacade.getValidServerRequestsDescriptions();
-			int i = 0;
-			for (; i < options.length; i++) {
-				System.out.println((i + 1) + " - " + options[i]);
-			}
-			
-			//reads and validates option
-			opt = scan.nextInt();
-			if (opt > 0 && opt <= options.length) {
-				opt--;
-				if (ProtocolFacade.isGetDevicesFunctionalities(opt)) {
-					listSelectIotFunctionalities(opt, index);
-				}
-				else {
-					//TODO: send to GUI
-					System.out.println(ProtocolFacade.runGeneralServerRequest(
-							opt, connectedIots, index, sender, receiver));
-				}
-				opt++;
-				break;
-			}
-			else if (opt == 0) {
-				//isOptionInvalid = false;
-				break;
-			}
-			System.out.println("Please enter a valid option\n-----------------");
-			
+	public String[] listSelectIotOptions() {
+		return ProtocolFacade.getValidServerRequestsDescriptions();
+	}
+	
+	public void executeIotStandardFunctionality(int iotIndex, int option) {
+		if (ProtocolFacade.isGetDevicesFunctionalities(option)) {
+			listSelectIotFunctionalities(option, iotIndex);
 		}
-		return opt == 0;
+		else {
+			//TODO: send to GUI
+			ui.showMessage(ProtocolFacade.runGeneralServerRequest(
+					option, connectedIots, iotIndex, sender, receiver));
+		}
 	}
 	
 	private void listSelectIotFunctionalities(int codeIndex, int index) {
@@ -153,28 +115,17 @@ public class App {
 		if (iotsConnectedSize == connectedIots.size()) {
 			String[] iotFunctionalities = iotFunctionalitiesStr.split(
 					Pattern.quote(ProtocolMessage.getSeparator()));
-			boolean finished = false;
 			
-			while (!finished) {
-				//Print options
-				System.out.println("0 - Quit");
-				for (int i = 0; i < iotFunctionalities.length; i++) {
-					System.out.println((i + 1) + " - " + iotFunctionalities[i]);
-				}
-				
-				int opt = scan.nextInt();
-				if (opt >= 0 && opt <= iotFunctionalities.length) {
-					finished = true;
-					System.out.println(ProtocolFacade.runSpecificIotFunctionality(connectedIots,
-							index, sender, receiver, iotFunctionalities[opt - 1]));
-					break;
-				}
-				System.out.println("\"" + opt + "\" is an invalid option");
+			int opt = ui.listIotSpecificFunctionalities(iotFunctionalities);
+			if (opt != -1) {
+				ui.showMessage(ProtocolFacade.runSpecificIotFunctionality(connectedIots,
+						index, sender, receiver, iotFunctionalities[opt]));
 			}
+			
 		}
 		else {
 			//TIMEOUT MESSAGE RECEIVED
-			System.out.println(iotFunctionalitiesStr);
+			ui.showErrorMessage(iotFunctionalitiesStr);
 		}
 	}
 }
