@@ -10,18 +10,19 @@ public class Protocol {
 	public static final int IOT_RECEIVER_PORT = 12114;
 	public static final int IOT_SENDER_PORT = IOT_RECEIVER_PORT + 1;
 	public static final String[] VALID_SERVER_REQUESTS = {"DSCNCT_IOT", "CHCK_UPDT", "UPDATE",
-			"GETFUNCLST", "RUNIOTFUNC"};
+			"GET_STATUS", "GETFUNCLST", "RUNIOTFUNC"};
 	public static final String[] VALID_SERVER_REQUESTS_DESCRIPTIONS = {"Disconnect device",
-			"Check for available updates", "Update device",
+			"Check for available updates", "Update device", "Get device's current status",
 			"Get list of device's specific functionalities"};
 	/* {DISCONNECT_IOT, GET_LIST_OF_FUNCTIONS, RUN_IOT_FUNCTION } 
 	 * Commands available:
 	 * 1 - Remove connection with server
 	 * 2 - Check for updates
 	 * 3 - Update
-	 * 4 - Get List of Methods
-	 * 5 - Execute Method 
-	 * 6 - List consumption (?)
+	 * 4 - Get iot status
+	 * 5 - Get List of Methods
+	 * 6 - Execute Method 
+	 * 7 - List consumption (?)
 	 */
 	
 	private static volatile ArrayList<IOTDevice> iotsFound;

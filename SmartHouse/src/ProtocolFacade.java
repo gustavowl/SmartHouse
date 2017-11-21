@@ -88,12 +88,14 @@ public class ProtocolFacade {
 				break;
 			case 2: //"UPDATE"
 				break;
-			case 3: //"GETFUNCLST"
+			case 3: //GET_STATUS
+				break;
+			case 4: //"GETFUNCLST"
 				System.out.println("SENDING IOT FUNCTIONALITIES TO SERVER");
 				Protocol.iotSendFunctionalitiesToServer(serverAddress, receiver,
 						sender, iotFacadeMethods);
 				break;
-			case 4: //"RUNIOTFUNC"
+			case 5: //"RUNIOTFUNC"
 				System.out.println("Functionality operation received by iot");
 				Protocol.iotSendRunFunctionalityRequestReceived(serverAddress, sender);
 		}
@@ -104,7 +106,8 @@ public class ProtocolFacade {
 	}
 	
 	public static boolean isGetDevicesFunctionalities(int index) {
-		return index == 3;
+		//index of GETFUNCLST
+		return index == 4;
 	}
 	
 	//disconnect, update, check for updates and Get list of device's specific functionalities
@@ -127,7 +130,15 @@ public class ProtocolFacade {
 				return "";
 			case 2: //"UPDATE"
 				return "";
-			case 3: //"GETFUNCLST"
+			case 3: //GET_STATUS
+				msgByte = null;
+				
+				if (ProtocolMessage.getMessageCode(msgByte).equals("TIMEOUT")) {
+					return iotTimeout(connectedIots, iotIndex); 
+				}
+				
+				return ProtocolMessage.getMessageContent(msgByte);
+			case 4: //"GETFUNCLST"
 				msgByte = Protocol.serverRequestIotFunctionalities(connectedIots.get(iotIndex).getAddress(),
 						receiver, sender);
 				
@@ -166,6 +177,6 @@ public class ProtocolFacade {
 	}
 	
 	public static boolean isRunDeviceFunctionality(String code) {
-		return code.equals(Protocol.VALID_SERVER_REQUESTS[4]);
+		return code.equals(Protocol.VALID_SERVER_REQUESTS[5]);
 	}
 }
