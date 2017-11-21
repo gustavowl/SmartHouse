@@ -405,4 +405,28 @@ public class Protocol {
 		sendMessage("IOTFUNCRCV", "", serverAddress.getHostAddress(), SERVER_RECEIVER_PORT, sender);
 		sender.close();
 	}
+	
+	public static byte[] serverRequestIotStatus(InetAddress iotAddress, ReceiverSocket receiver,
+			SenderSocket sender) {
+		
+		sender.open(SERVER_SENDER_PORT, false);
+		receiver.open(SERVER_RECEIVER_PORT, false);
+		
+		byte[] result = sendMessageAndWait("GET_STATUS", "", iotAddress.getHostAddress(), IOT_RECEIVER_PORT,
+				60, sender, "IOT_STATUS", receiver);
+		
+		receiver.close();
+		sender.close();
+		
+		if (result != null) {
+			return result;
+		}
+		return ProtocolMessage.createMessage("TIMEOUT", "");
+	}
+	
+	public static void iotSendStatus(String status, InetAddress serverAddress, SenderSocket sender) {
+		sender.open(IOT_SENDER_PORT, false);
+		sendMessage("IOT_STATUS", status, serverAddress.getHostAddress(), SERVER_RECEIVER_PORT, sender);
+		sender.close();
+	}
 }

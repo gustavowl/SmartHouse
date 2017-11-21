@@ -19,7 +19,7 @@ public class Digivice extends IOT_IOTDevice {
 		for (Method method : c.getDeclaredMethods()) {
 			String str = method.getName();
 			if (method.toString().indexOf("private") != 0 && !str.equals("getFacadeMethods") &&
-					!str.equals("executeFacadeMethod")) {
+					!str.equals("executeFacadeMethod")  && !str.equals("getIotStatus")) {
 				
 				methods.add(method);
 			}
@@ -82,5 +82,10 @@ public class Digivice extends IOT_IOTDevice {
 		else {
 			System.out.println("I'm already at my weakest form!");
 		}
+	}
+
+	@Override
+	public String getIotStatus() {
+		return "My current form is " + evolutions[form];
 	}
 }

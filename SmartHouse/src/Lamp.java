@@ -14,14 +14,14 @@ public class Lamp extends IOT_IOTDevice {
 		super(name);
 		isLampOn = false;
 		
-		Class<? extends Lamp> c = this.getClass();
+		Class<? extends Object> c = this.getClass();
 		facadeMethods = c.getDeclaredMethods();
 		ArrayList<Method> methods = new ArrayList<Method>();
 		for (Method method : c.getDeclaredMethods()) {
 			String str = method.getName();
 			if (method.toString().indexOf("private") != 0 && !str.equals("getFacadeMethods") &&
-					!str.equals("executeFacadeMethod")) {
-				
+					!str.equals("executeFacadeMethod") && !str.equals("getIotStatus")) {
+
 				methods.add(method);
 			}
 		}
@@ -73,7 +73,15 @@ public class Lamp extends IOT_IOTDevice {
 		System.out.println("Lamp is off");
 	}
 	
-	public boolean getLampState() {
+	private boolean getLampState() {
 		return isLampOn;
+	}
+
+	@Override
+	public String getIotStatus() {
+		if (getLampState()) {
+			return "Lamp is ON";
+		}
+		return "Lamp is OFF";
 	}
 }

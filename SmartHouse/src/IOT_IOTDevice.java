@@ -62,7 +62,13 @@ public abstract class IOT_IOTDevice extends IOTDevice {
 		while (peerAddress != null) {
 			byte[] message = protocol.listenToServerRequests(getPeerAddress(), receiver);
 			String code = ProtocolMessage.getMessageCode(message);
-			protocol.answerServerRequest(code, getPeerAddress(), receiver, sender, getFacadeMethods());
+			String content = "";
+			if (ProtocolFacade.isGetStatus(code)) {
+				//run get status
+				content = getIotStatus(); 
+			}
+			protocol.answerServerRequest(code, content, getPeerAddress(), receiver,
+					sender, getFacadeMethods());
 			if (ProtocolFacade.isDisconnectRequest(code)) {
 				peerAddress = null;
 				//TODO: change to GUI
@@ -70,7 +76,7 @@ public abstract class IOT_IOTDevice extends IOTDevice {
 			}
 			else if (ProtocolFacade.isRunDeviceFunctionality(code)) {
 				//run method
-				String content = ProtocolMessage.getMessageContent(message);
+				content = ProtocolMessage.getMessageContent(message);
 				this.executeFacadeMethod(content, new String[] {});
 				//run this
 			}
@@ -90,4 +96,6 @@ public abstract class IOT_IOTDevice extends IOTDevice {
 	public abstract ArrayList<String> getFacadeMethods();
 	
 	public abstract void executeFacadeMethod(String methodSignature, String[] args);
+	
+	public abstract String getIotStatus();
 }

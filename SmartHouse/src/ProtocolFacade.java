@@ -70,8 +70,8 @@ public class ProtocolFacade {
 		return msg; 
 	}
 	
-	public void answerServerRequest(String code, InetAddress serverAddress, ReceiverSocket receiver, 
-			SenderSocket sender, ArrayList<String> iotFacadeMethods) {
+	public void answerServerRequest(String code, String message, InetAddress serverAddress,
+			ReceiverSocket receiver, SenderSocket sender, ArrayList<String> iotFacadeMethods) {
 		int opt = -1;
 		for (int i = 0; i < Protocol.VALID_SERVER_REQUESTS.length; i++) {
 			if (code.equals(Protocol.VALID_SERVER_REQUESTS[i])) {
@@ -89,6 +89,8 @@ public class ProtocolFacade {
 			case 2: //"UPDATE"
 				break;
 			case 3: //GET_STATUS
+				System.out.println("SENDING IOT STATUS TO SERVER");
+				Protocol.iotSendStatus(message, serverAddress, sender);
 				break;
 			case 4: //"GETFUNCLST"
 				System.out.println("SENDING IOT FUNCTIONALITIES TO SERVER");
@@ -131,7 +133,8 @@ public class ProtocolFacade {
 			case 2: //"UPDATE"
 				return "";
 			case 3: //GET_STATUS
-				msgByte = null;
+				msgByte = Protocol.serverRequestIotStatus(connectedIots.get(iotIndex).getAddress(),
+						receiver, sender);
 				
 				if (ProtocolMessage.getMessageCode(msgByte).equals("TIMEOUT")) {
 					return iotTimeout(connectedIots, iotIndex); 
@@ -179,4 +182,9 @@ public class ProtocolFacade {
 	public static boolean isRunDeviceFunctionality(String code) {
 		return code.equals(Protocol.VALID_SERVER_REQUESTS[5]);
 	}
+	
+	public static boolean isGetStatus(String code) {
+		return code.equals(Protocol.VALID_SERVER_REQUESTS[3]);
+	}
+
 }
