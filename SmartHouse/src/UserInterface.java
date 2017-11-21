@@ -75,13 +75,10 @@ public abstract class UserInterface {
 		 */
 		showDiscoveryInitialOptions();
 		app.discoveryStart();
-		//ThreadWriter tw = new ThreadWriter("UI Writer");
-		//tw.start();
 
 		int opt = readOptionUntilValid();
 		opt = executeDiscoveryOption(opt);
 		
-		//tw.interrupt();
 		app.discoveryFinish(opt);
 		setOptionRangeInvalid();
 	}
@@ -98,35 +95,4 @@ public abstract class UserInterface {
 	//runs specific options if necessary. Returns the index of
 	//selected iot if that's the case or -1 otherwise
 	protected abstract int executeDiscoveryOption(int option);
-	
-	/*
-	class ThreadWriter extends Thread {
-		//TODO: transfer to GUI
-		volatile boolean finish = false;
-		
-		public ThreadWriter(String name) {
-			super(name);
-		}
-		
-		@Override
-		public void run() {
-			int i = 0;
-			ArrayList<IOTDevice> iots;
-			//STEP 3
-			showDiscoveryInitialOptions();
-			while (!finish) {
-				iots = app.getNewIotsDiscovered(i);
-				for (; iots != null && iots.size() > 0; i++) {
-					AppIOTDevice iot = (AppIOTDevice)iots.remove(0);
-					showNewDiscoveryOption(iot.getName());
-				}
-			}
-		}
-		
-		@Override
-		public void interrupt() {
-			finish = true;
-			super.interrupt();
-		}
-	}*/
 }
