@@ -9,6 +9,8 @@ public class App {
 	private ProtocolFacade protocol;
 	private ReceiverSocket receiver;
 	private SenderSocket sender;
+	private ThreadWriter  tw;
+	private UserInterface ui;
 	
 	public App() {
 		connectedIots = new ArrayList<AppIOTDevice>();
@@ -16,42 +18,14 @@ public class App {
 		protocol = new ProtocolFacade();
 		receiver = new ReceiverSocket();
 		sender = new SenderSocket();
+		ui = new StandardUserInterface(this);
 	}
 	
-	//TODO: extends runnable?
 	public void run() {
-		boolean finish = false;
-		int opt;
-		while (!finish) {
-			System.out.println("------------------------------------");
-			System.out.println("This is the Smart House app!");
-			System.out.println("Please, choose the desisred action:");
-			System.out.println("1 - Discover new IoTs");
-			System.out.println("2 - Select IoT");
-			System.out.println("3 - Quit app");
-			
-			opt = scan.nextInt();
-			
-			switch(opt) {
-				case 1:
-					discover();
-					break;
-				case 2:
-					selectIOT();
-					break;
-				case 3:
-					System.out.println("Goodbye! We hope to see you soon enough.");
-					finish = true;
-					break;
-				default: 
-					System.out.println("That is an invalid option!");
-					break;
-			}
-		}
-		scan.close();
+		ui.run();
 	}
 	
-	public void discover() {
+	public void discoveryStart() {
 		/* Protocol outline:
 		 * 1 - Sends broadcast message in order to discover new devices
 		 * 2 - Receives messages from multiple devices
@@ -61,20 +35,15 @@ public class App {
 		 */
 		protocol.IOTDiscoveryStart(receiver, sender);
 		iotsDiscovered = new ArrayList<AppIOTDevice>();
-		ThreadWriter tw = new ThreadWriter("Writer");
+		tw = new ThreadWriter("Writer");
 		tw.start();
-		
-		int opt = scan.nextInt();
-		while ( !(opt >= 0 && opt <= iotsDiscovered.size()) ) {
-			System.out.println("INVALID OPTION. Range: " + 0 + " - " + 
-					iotsDiscovered.size());
-			opt = scan.nextInt();
-		}
-			
+	}
+	
+	public void discoveryFinish(int iotIndex) {			
 		protocol.IOTDiscoveryStop();
 		tw.interrupt();
-		if (opt > 0 ) {
-			AppIOTDevice iot = iotsDiscovered.get(opt - 1);
+		if (iotIndex >= 0 && iotIndex < iotsDiscovered.size()) {
+			AppIOTDevice iot = iotsDiscovered.get(iotIndex);
 			
 			protocol.confirmConnection(iot.getAddress(), sender); //STEP 4
 			connectedIots.add(iot); //STEP 5
@@ -84,6 +53,17 @@ public class App {
 		}
 		iotsDiscovered.clear();
 		iotsDiscovered = null;
+	}
+	
+	public ArrayList<IOTDevice> getNewIotsDiscovered(int discoveredSize) {
+		if (iotsDiscovered.size() > discoveredSize) {
+			ArrayList<IOTDevice> devices = new ArrayList<IOTDevice>();
+			for (int i = discoveredSize; i < iotsDiscovered.size(); i++) {
+				devices.add(iotsDiscovered.get(i));
+			}
+			return devices;
+		}
+		return null;
 	}
 	
 	class ThreadWriter extends Thread {
@@ -99,13 +79,11 @@ public class App {
 			int i = 0;
 			ArrayList<IOTDevice> iots;
 			//STEP 3
-			System.out.println("0 - Quit");
 			while (!finish) {
 				iots = protocol.getIotsDiscovered();
 				for (; iots != null && iots.size() > 0; i++) {
 					AppIOTDevice iot = (AppIOTDevice)iots.remove(0);
-					System.out.println(Integer.toString(i+1) + " - " + 
-							iot.getName());
+					ui.showNewDiscoveredIot(iot.getName());
 					iotsDiscovered.add(iot);
 				}
 			}
@@ -118,7 +96,7 @@ public class App {
 		}
 	}
 	
-	private void selectIOT() {
+	public void selectIOT() {
 		boolean finish = false;
 		while (!finish) {
 			//TODO: Transfer to GUI
