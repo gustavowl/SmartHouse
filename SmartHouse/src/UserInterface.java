@@ -40,8 +40,6 @@ public abstract class UserInterface {
 	
 	protected abstract void showInitialOptions();
 	
-	//protected abstract int readInitialOption();
-	
 	protected abstract int readOption();
 	
 	protected int readOptionUntilValid() {

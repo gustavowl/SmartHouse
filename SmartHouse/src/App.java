@@ -55,17 +55,6 @@ public class App {
 		iotsDiscovered = null;
 	}
 	
-	public ArrayList<IOTDevice> getNewIotsDiscovered(int discoveredSize) {
-		if (iotsDiscovered.size() > discoveredSize) {
-			ArrayList<IOTDevice> devices = new ArrayList<IOTDevice>();
-			for (int i = discoveredSize; i < iotsDiscovered.size(); i++) {
-				devices.add(iotsDiscovered.get(i));
-			}
-			return devices;
-		}
-		return null;
-	}
-	
 	class ThreadWriter extends Thread {
 		//TODO: transfer to GUI
 		volatile boolean finish = false;
