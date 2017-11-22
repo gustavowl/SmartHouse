@@ -1,7 +1,10 @@
 package device;
 
+import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import entities.Log;
 
 public abstract class Device {
 	
@@ -12,9 +15,11 @@ public abstract class Device {
 	private int id;
 	private String nome;
 	private String tipo;
+	private ArrayList<Log> logs;
 	
 	Device() {
 		tipo = "";
+		logs = new ArrayList<Log>();
 	}
 	
 	//zera o timer caso ativo
@@ -29,7 +34,7 @@ public abstract class Device {
 
             public void run() {
                 if (interval == 0) {
-                    System.out.println("work finished");
+                    System.out.println("Time finished");
                     time.cancel();
                     time.purge();
                 } else {
@@ -77,7 +82,11 @@ public abstract class Device {
 	}
 
 	public String getNome() {
+		if(nome == null || nome.equals("")) {
+			nome = this.getClass().getName();
+		}
 		return nome;
+		
 	}
 
 	public void setNome(String nome) {
@@ -91,8 +100,14 @@ public abstract class Device {
 	public void setTipo(String tipo) {
 		this.tipo = tipo;
 	}
+
+	public ArrayList<Log> getLogs() {
+		return logs;
+	}
+
+	public void setLogs(ArrayList<Log> logs) {
+		this.logs = logs;
+	}
 	
-	
-    
  	
 }

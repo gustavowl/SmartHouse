@@ -26,7 +26,7 @@ public class SobreDevice extends JFrame {
 
 	private JPanel contentPane;
 	javax.swing.JFrame jframe;
-	DeviceUI ui;
+	DeviceManager ui;
 	private JLabel nomeInfo;
 	private JLabel tipoInfo;
 	private Device deviceSobre;
@@ -81,11 +81,11 @@ public class SobreDevice extends JFrame {
 		panel.add(btnCancelar);
 		
 		nomeInfo = new JLabel("");
-		nomeInfo.setBounds(183, 41, 70, 15);
+		nomeInfo.setBounds(183, 41, 147, 15);
 		panel.add(nomeInfo);
 		
 		tipoInfo = new JLabel("");
-		tipoInfo.setBounds(183, 90, 70, 15);
+		tipoInfo.setBounds(183, 90, 147, 15);
 		panel.add(tipoInfo);
 				
 				
@@ -96,11 +96,11 @@ public class SobreDevice extends JFrame {
 	}
 	
 	public void setUi() {
-		ui = (DeviceUI) this.jframe;
+		ui = (DeviceManager) this.jframe;
 		deviceSobre = null;
 		
 		//Pega o nome do device selecionado (Pegar por String pq o jList eh de String!)
-		String nomeDevice = (String) ui.getModel().getElementAt(ui.getJlist().getSelectedIndex());
+		String nomeDevice = (String) ui.getModel().getElementAt(ui.getList().getSelectedIndex());
 	
 		//Pega a Instancia do Device atraves da procura pelo Nome
 		for(Device deviceTemp : ui.getConnectedD().getDevices()) {

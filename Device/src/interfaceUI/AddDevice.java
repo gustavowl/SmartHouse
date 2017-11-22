@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -27,9 +28,10 @@ public class AddDevice extends JFrame {
 	private JPanel contentPane;
 	private JTextField textField;
 	private ConnectedDevices connectedD;
-	JComboBox comboBox;
+	JComboBox<String> comboBox;
 	javax.swing.JFrame jframe;
-	DeviceUI ui;
+	DeviceManager ui;
+	private ArrayList<Device> devicesNaRede;
 
 	/**
 	 * Launch the application.
@@ -63,23 +65,39 @@ public class AddDevice extends JFrame {
 		panel.setLayout(null);
 		contentPane.add(panel, BorderLayout.CENTER);
 		
-		JLabel lblNome = new JLabel("Nome");
-		lblNome.setBounds(57, 41, 70, 15);
+		JLabel lblNome = new JLabel("Nome:");
+		lblNome.setBounds(88, 41, 65, 15);
 		panel.add(lblNome);
 		
-		JLabel lblTipo = new JLabel("Tipo");
-		lblTipo.setBounds(57, 90, 70, 15);
+		JLabel lblTipo = new JLabel("Devices na Rede:");
+		lblTipo.setBounds(12, 90, 141, 15);
 		panel.add(lblTipo);
 		
 		comboBox = new JComboBox();
-		comboBox.setBounds(161, 85, 114, 24);
-		for(String d : connectedD.DEVICESSUPPORTED) {
+		comboBox.setBounds(156, 85, 160, 24);
+		
+		//Antes era um comboBox com os tipos de devices,
+		//agora que é framework, vao ser os devices da rede
+		/*for(String d : connectedD.DEVICESSUPPORTED) {
 			comboBox.addItem(d);
+		}*/
+		
+		Device camera10 = new Camera();
+		Device thermostat20 = new Thermostat();
+		Device lampada30 = new Lampada();
+		
+		devicesNaRede = new ArrayList<Device>();
+		devicesNaRede.add(camera10);
+		devicesNaRede.add(thermostat20);
+		devicesNaRede.add(lampada30);
+		 
+		for(Device d : devicesNaRede) {
+			comboBox.addItem(d.getNome());
 		}
 		panel.add(comboBox);
 		
 		textField = new JTextField();
-		textField.setBounds(161, 39, 114, 19);
+		textField.setBounds(156, 39, 160, 19);
 		panel.add(textField);
 		textField.setColumns(10);
 		
@@ -102,6 +120,18 @@ public class AddDevice extends JFrame {
 		btnCancelar.setBounds(258, 211, 117, 25);
 		panel.add(btnCancelar);
 		
+		JButton btnRefresh = new JButton("Refresh");
+		btnRefresh.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Device refreshSimulator = new WallSocket();
+				refreshSimulator.setNome("Refresh Simulator");
+				devicesNaRede.add(refreshSimulator);
+				comboBox.addItem(refreshSimulator.getNome());
+			}
+		});
+		btnRefresh.setBounds(156, 138, 101, 25);
+		panel.add(btnRefresh);
+		
 		
 	}
 	
@@ -114,6 +144,38 @@ public class AddDevice extends JFrame {
 	}
 	
 	public void addDevice() {
+		Device deviceTemp = null;
+		int indexCombo = 0;
+		try {
+			for(Device d : devicesNaRede) {
+				if(comboBox.getSelectedItem().equals(d.getNome())) {
+					d.setNome(textField.getText());
+					deviceTemp = d;
+					indexCombo = comboBox.getSelectedIndex();
+				}
+			}
+			boolean existeNaLista = false;
+			for(Device d : connectedD.getDevices()) {
+				if(deviceTemp.getNome().equals(d.getNome())) {
+					existeNaLista = true;
+				}
+					
+			}
+			
+			if(!existeNaLista) {
+				adicionaDevice(deviceTemp);
+				devicesNaRede.remove(deviceTemp);
+				comboBox.removeItemAt(indexCombo);
+			}
+		}
+		catch (Exception e) {
+			new ErrorWindow(true);
+			// TODO: handle exception
+		}
+	}
+	
+	/*Funcao usada antes de ser um FrameWork*/
+	/*public void addDevice() {
 		Device d = null;
 		
 		if(comboBox.getSelectedIndex() == 0)
@@ -147,14 +209,14 @@ public class AddDevice extends JFrame {
 		//d.setId();
 		
 
-	}	
+	}	*/
 	
 	public void instancia(javax.swing.JFrame jframe) {
 		this.jframe = jframe;
 	}
 	
 	public void adicionaDevice(Device d) {
-		ui = (DeviceUI) this.jframe;
+		ui = (DeviceManager) this.jframe;
 		connectedD.addDevice(d);
 		ui.addNewDevice(d);
 		textField.setText("");
@@ -162,5 +224,4 @@ public class AddDevice extends JFrame {
 		
 		
 	}
-
 }
