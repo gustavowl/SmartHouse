@@ -14,7 +14,7 @@ import java.awt.event.ActionEvent;
 public class TelaInicial extends JFrame {
 
 	private JPanel contentPane;
-	private DeviceManager devideM;
+	private DeviceUI devideM;
 	private LogUI logUI;
 
 	/**
@@ -37,7 +37,7 @@ public class TelaInicial extends JFrame {
 	 * Create the frame.
 	 */
 	public TelaInicial() {
-		devideM = new DeviceManager();
+		devideM = new DeviceUI();
 		logUI = new LogUI();
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 450, 300);

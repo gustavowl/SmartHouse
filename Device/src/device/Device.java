@@ -4,22 +4,58 @@ import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import entities.Field;
 import entities.Log;
+import interfaces.DevicesFields;
 
-public abstract class Device {
+public abstract class Device implements DevicesFields{
 	
-	public static int interval;
+	private static int interval;
 	
-	private String productID; 
-	private Boolean ligada;
-	private int id;
-	private String nome;
-	private String tipo;
-	private ArrayList<Log> logs;
+	public String productID; 
+	public Boolean ligada;
+	public int id;
+	public String nome;
+	public String tipo;
+	public ArrayList<Log> logs;
+	public ArrayList<Field> fields;
 	
 	Device() {
 		tipo = "";
 		logs = new ArrayList<Log>();
+		fields = new ArrayList<Field>();
+		setFieldsValues();
+		
+	}
+	
+	public void setFieldsValues() {
+		//Adiciona no array de Fieldds cada atributo da classe
+		for(java.lang.reflect.Field fieldClass : this.getClass().getFields()) {
+			System.out.println(fieldClass.getName());
+			Field fieldTemp = new Field(fieldClass.getName(), " " + fieldClass.getType(), " ");
+
+			switch(fieldTemp.getNome()) {
+				
+			case "productID":
+				fieldTemp.setValor(getProductID());
+				break;
+			case "ligada":
+				fieldTemp.setValor(""+getLigada());
+				break;
+			case "id":
+				fieldTemp.setValor(""+getId());
+				break;
+			case "nome":
+				fieldTemp.setValor(getNome());
+				break;
+			case "tipo":	
+				fieldTemp.setValor(getTipo());
+				break;
+			default:
+				fieldTemp.setValor("null");
+			}
+			fields.add(fieldTemp);
+		}
 	}
 	
 	//zera o timer caso ativo
@@ -91,6 +127,13 @@ public abstract class Device {
 
 	public void setNome(String nome) {
 		this.nome = nome;
+		
+		//Atualiza o nome no objeto Field de Device
+		for(Field fieldTemp : getFields()) {
+			if(fieldTemp.getNome() == "nome") {
+				fieldTemp.setValor(nome);
+			}
+		}
 	}
 
 	public String getTipo() {
@@ -108,6 +151,21 @@ public abstract class Device {
 	public void setLogs(ArrayList<Log> logs) {
 		this.logs = logs;
 	}
-	
- 	
+
+	public static int getInterval() {
+		return interval;
+	}
+
+	public static void setInterval(int interval) {
+		Device.interval = interval;
+	}
+
+	public ArrayList<Field> getFields() {
+		return fields;
+	}
+
+	public void setFields(ArrayList<Field> fields) {
+		this.fields = fields;
+	}
+
 }

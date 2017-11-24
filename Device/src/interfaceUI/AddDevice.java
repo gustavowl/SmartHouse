@@ -30,7 +30,7 @@ public class AddDevice extends JFrame {
 	private ConnectedDevices connectedD;
 	JComboBox<String> comboBox;
 	javax.swing.JFrame jframe;
-	DeviceManager ui;
+	DeviceUI ui;
 	private ArrayList<Device> devicesNaRede;
 
 	/**
@@ -216,7 +216,7 @@ public class AddDevice extends JFrame {
 	}
 	
 	public void adicionaDevice(Device d) {
-		ui = (DeviceManager) this.jframe;
+		ui = (DeviceUI) this.jframe;
 		connectedD.addDevice(d);
 		ui.addNewDevice(d);
 		textField.setText("");

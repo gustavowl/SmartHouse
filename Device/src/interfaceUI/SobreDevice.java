@@ -5,11 +5,13 @@ import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.border.EmptyBorder;
 
 import Connection.ConnectedDevices;
@@ -19,17 +21,23 @@ import device.Lampada;
 import device.Tag;
 import device.Thermostat;
 import device.WallSocket;
+import entities.Field;
 
 import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
 
 public class SobreDevice extends JFrame {
 
 	private JPanel contentPane;
 	javax.swing.JFrame jframe;
-	DeviceManager ui;
+	DeviceUI ui;
 	private JLabel nomeInfo;
 	private JLabel tipoInfo;
 	private Device deviceSobre;
+	private DefaultListModel model;
+	private JList<String> list;
 	
 
 	/**
@@ -52,8 +60,9 @@ public class SobreDevice extends JFrame {
 	 * Create the frame.
 	 */
 	public SobreDevice() {
+		model = new DefaultListModel();
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(600, 200, 450, 300);
+		setBounds(600, 200, 550, 360);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		contentPane.setLayout(new BorderLayout(0, 0));
@@ -64,11 +73,11 @@ public class SobreDevice extends JFrame {
 		contentPane.add(panel, BorderLayout.CENTER);
 		
 		JLabel lblNome = new JLabel("Nome:");
-		lblNome.setBounds(57, 41, 70, 15);
+		lblNome.setBounds(57, 30, 70, 15);
 		panel.add(lblNome);
 		
 		JLabel lblTipo = new JLabel("Tipo:");
-		lblTipo.setBounds(57, 90, 70, 15);
+		lblTipo.setBounds(57, 57, 70, 15);
 		panel.add(lblTipo);
 		
 		JButton btnCancelar = new JButton("Fechar");
@@ -77,18 +86,38 @@ public class SobreDevice extends JFrame {
 				dispose();
 			}
 		});
-		btnCancelar.setBounds(145, 185, 117, 25);
+		btnCancelar.setBounds(207, 313, 117, 25);
 		panel.add(btnCancelar);
 		
 		nomeInfo = new JLabel("");
-		nomeInfo.setBounds(183, 41, 147, 15);
+		nomeInfo.setBounds(183, 30, 147, 15);
 		panel.add(nomeInfo);
+		//panel.add(list);
+		JScrollPane scrollPane = new JScrollPane(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+			     ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+		scrollPane.setLocation(57, 126);
+		scrollPane.setSize(415, 176);
+		panel.add(scrollPane);
+		
+		list = new JList();
+		scrollPane.setViewportView(list);
+		list.setModel(model);
+		
+		JLabel lblSeusAtributos = new JLabel("Seus Atributos");
+		lblSeusAtributos.setBounds(57, 99, 117, 15);
+		panel.add(lblSeusAtributos);
 		
 		tipoInfo = new JLabel("");
-		tipoInfo.setBounds(183, 90, 147, 15);
+		tipoInfo.setBounds(183, 57, 147, 15);
 		panel.add(tipoInfo);
-				
-				
+		
+		/*JScrollBar scrollBar = new JScrollBar();
+		scrollBar.setBounds(57, 126, 17, 100);
+		panel.add(scrollBar);*/
+		
+		/*JScrollPane scrollPane = new JScrollPane();
+		//scrollPane.setViewportView(list);
+		panel.add(scrollPane);*/
 	}
 	
 	public void instancia(javax.swing.JFrame jframe) {
@@ -96,7 +125,7 @@ public class SobreDevice extends JFrame {
 	}
 	
 	public void setUi() {
-		ui = (DeviceManager) this.jframe;
+		ui = (DeviceUI) this.jframe;
 		deviceSobre = null;
 		
 		//Pega o nome do device selecionado (Pegar por String pq o jList eh de String!)
@@ -132,6 +161,9 @@ public class SobreDevice extends JFrame {
 
 		nomeInfo.setText(deviceSobre.getNome());
 		tipoInfo.setText(deviceSobre.getTipo());
+		model.removeAllElements();
+		for(Field fieldTemp: deviceSobre.getFields()) {
+			model.addElement(fieldTemp.toString());
+		}
 	}
-	
 }
