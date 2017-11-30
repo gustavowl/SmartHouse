@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.regex.Pattern;
 
 
 public abstract class UserInterface {
@@ -155,8 +156,20 @@ public abstract class UserInterface {
 		
 		if (opt != -1) {
 			StringBuilder message = new StringBuilder();
-			app.executeIotStandardFunctionality(iotIndex, opt, message);
-			showMessage(message.toString());
+			if (app.executeIotStandardFunctionality(iotIndex, opt, message)) {
+				String[] iotFunctionalities = message.toString().split(
+						Pattern.quote(ProtocolMessage.getSeparator()));
+				
+				opt = listIotSpecificFunctionalities(iotFunctionalities);
+				
+				if (opt != -1) {
+					showMessage(app.executeIotSpecificFunctionality(
+							iotIndex, iotFunctionalities[opt]));
+				}
+			}
+			else {
+				showMessage(message.toString());
+			}
 		}
 		setOptionRangeInvalid();
 	}

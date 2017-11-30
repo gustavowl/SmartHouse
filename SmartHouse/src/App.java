@@ -99,37 +99,38 @@ public class App {
 		return ProtocolFacade.getValidServerRequestsDescriptions();
 	}
 	
-	//returns false whenever an error occurred
+	//returns true if list
 	public boolean executeIotStandardFunctionality(int iotIndex, int option, StringBuilder message) {
 		if (ProtocolFacade.isGetDevicesFunctionalities(option)) {
-			int iotsConnectedSize = connectedIots.size();
+			//int iotsConnectedSize = connectedIots.size();
 			
 			String iotFunctionalitiesStr = ProtocolFacade.runGeneralServerRequest(option,
 					connectedIots, iotIndex, sender, receiver);
 			
 			message.append(iotFunctionalitiesStr);
-			if (iotsConnectedSize != connectedIots.size()) {
+			/*if (iotsConnectedSize != connectedIots.size()) {
 				//TIMEOUT MESSAGE RECEIVED
-				return false;
-			}
+				return true;
+			}*/
+			return true;
 		}
 		else {
 			message.append(ProtocolFacade.runGeneralServerRequest(
 					option, connectedIots, iotIndex, sender, receiver));
+			return false;
 		}
-		return true;
 	}
 	
-	private String listSelectIotFunctionalities(int codeIndex, int index) {
-
-			/*String[] iotFunctionalities = iotFunctionalitiesStr.split(
-					Pattern.quote(ProtocolMessage.getSeparator()));
-			
-			int opt = ui.listIotSpecificFunctionalities(iotFunctionalities);
-			if (opt != -1) {
-				ui.showMessage(ProtocolFacade.runSpecificIotFunctionality(connectedIots,
-						index, sender, receiver, iotFunctionalities[opt]));
-			}*/
-		return null;
+	public String executeIotSpecificFunctionality(int iotIndex, String functionality) {
+		/*String[] iotFunctionalities = iotFunctionalitiesStr.split(
+				Pattern.quote(ProtocolMessage.getSeparator()));
+		
+		int opt = ui.listIotSpecificFunctionalities(iotFunctionalities);
+		if (opt != -1) {
+			ui.showMessage(ProtocolFacade.runSpecificIotFunctionality(connectedIots,
+					index, sender, receiver, iotFunctionalities[opt]));
+		}*/
+		return ProtocolFacade.runSpecificIotFunctionality(connectedIots, 
+				iotIndex, sender, receiver, functionality);
 	}
 }
