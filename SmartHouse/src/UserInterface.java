@@ -154,7 +154,9 @@ public abstract class UserInterface {
 		opt = executeListIotStandardFunctionalities(opt);
 		
 		if (opt != -1) {
-			app.executeIotStandardFunctionality(iotIndex, opt);
+			StringBuilder message = new StringBuilder();
+			app.executeIotStandardFunctionality(iotIndex, opt, message);
+			showMessage(message.toString());
 		}
 		setOptionRangeInvalid();
 	}
