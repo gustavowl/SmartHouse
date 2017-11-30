@@ -1,20 +1,17 @@
 import java.util.ArrayList;
-import java.util.Scanner;
 import java.util.regex.Pattern;
 
 public class App {
 	ArrayList<AppIOTDevice> connectedIots;
 	private ArrayList<AppIOTDevice> iotsDiscovered;
-	private Scanner scan;
 	private ProtocolFacade protocol;
 	private ReceiverSocket receiver;
 	private SenderSocket sender;
-	private ThreadWriter  tw;
+	private ThreadDiscoverer  td;
 	private UserInterface ui;
 	
 	public App() {
 		connectedIots = new ArrayList<AppIOTDevice>();
-		scan = new Scanner(System.in);
 		protocol = new ProtocolFacade();
 		receiver = new ReceiverSocket();
 		sender = new SenderSocket();
@@ -35,13 +32,13 @@ public class App {
 		 */
 		protocol.IOTDiscoveryStart(receiver, sender);
 		iotsDiscovered = new ArrayList<AppIOTDevice>();
-		tw = new ThreadWriter("Writer");
-		tw.start();
+		td = new ThreadDiscoverer("Writer");
+		td.start();
 	}
 	
 	public void discoveryFinish(int iotIndex) {			
 		protocol.IOTDiscoveryStop();
-		tw.interrupt();
+		td.interrupt();
 		if (iotIndex >= 0 && iotIndex < iotsDiscovered.size()) {
 			AppIOTDevice iot = iotsDiscovered.get(iotIndex);
 			
@@ -55,24 +52,29 @@ public class App {
 		iotsDiscovered = null;
 	}
 	
-	class ThreadWriter extends Thread {
+	public String getNewDiscoveredDevice(int iotIndex) {
+		if (iotIndex < iotsDiscovered.size()) {
+			return iotsDiscovered.get(iotIndex).getName();
+		}
+		return null;
+	}
+	
+	class ThreadDiscoverer extends Thread {
 		//TODO: transfer to GUI
 		volatile boolean finish = false;
 		
-		public ThreadWriter(String name) {
+		public ThreadDiscoverer(String name) {
 			super(name);
 		}
 		
 		@Override
 		public void run() {
-			int i = 0;
 			ArrayList<IOTDevice> iots;
 			//STEP 3
 			while (!finish) {
 				iots = protocol.getIotsDiscovered();
-				for (; iots != null && iots.size() > 0; i++) {
+				while (iots != null && iots.size() > 0) {
 					AppIOTDevice iot = (AppIOTDevice)iots.remove(0);
-					ui.showNewDiscoveredIot(iot.getName());
 					iotsDiscovered.add(iot);
 				}
 			}

@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 
 public abstract class UserInterface {
 	
@@ -75,10 +77,13 @@ public abstract class UserInterface {
 		 */
 		showDiscoveryInitialOptions();
 		app.discoveryStart();
+		ThreadWriter tw = new ThreadWriter("Writer");
+		tw.start();
 
 		int opt = readOptionUntilValid();
 		opt = executeDiscoveryOption(opt);
 		
+		tw.interrupt();
 		app.discoveryFinish(opt);
 		setOptionRangeInvalid();
 	}
@@ -106,6 +111,34 @@ public abstract class UserInterface {
 			listIotStandardFunctionalities(opt);
 		}
 		setOptionRangeInvalid();
+	}
+	
+	class ThreadWriter extends Thread {
+		//TODO: transfer to GUI
+		volatile boolean finish = false;
+		
+		public ThreadWriter(String name) {
+			super(name);
+		}
+		
+		@Override
+		public void run() {
+			int i = 0;
+			//STEP 3
+			while (!finish) {
+				String name = app.getNewDiscoveredDevice(i);
+				if (name != null) {
+					showNewDiscoveredIot(name);
+					i++;
+				}
+			}
+		}
+		
+		@Override
+		public void interrupt() {
+			finish = true;
+			super.interrupt();
+		}
 	}
 	
 	protected abstract void showListSelectedIotsOptions(String[] connectedIots);
