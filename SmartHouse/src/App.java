@@ -7,15 +7,14 @@ public class App {
 	private Receiver receiver;
 	private Sender sender;
 	private ThreadDiscoverer  td;
-	private UserInterface ui;
 	
 	public App(Receiver receiver, Sender sender) {
 		connectedIots = new ArrayList<AppIOTDevice>();
 		protocol = new ProtocolFacade();
 		this.receiver = receiver;
 		this.sender = sender;
-		ui = new StandardUserInterface(this);
 	}
+
 	
 	public void discoveryStart() {
 		/* Protocol outline:
