@@ -17,6 +17,23 @@ public abstract class Receiver {
 	
 	public abstract boolean isClosed();
 	
+	protected abstract String getPacketAddress(Object packet);
+	
+	protected abstract String getPacketContent(Object packet);
+	
+	protected ArrayList<String> extractDatagramContent(Object[] packets) {
+		ArrayList<String> content = new ArrayList<String>(packets.length);
+		for (Object packet : packets) {
+			content.add(extractDatagramContent(packet));
+		}
+		return content;
+	}
+	
+	protected String extractDatagramContent(Object packet) {
+		setPeerAddress(getPacketAddress(packet));
+		return getPacketContent(packet);
+	}
+	
 	public abstract ArrayList<String> receiveData(int packetsMax);
 	
 	public abstract String receiveData(String code);

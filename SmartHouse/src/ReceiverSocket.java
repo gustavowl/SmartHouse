@@ -101,19 +101,15 @@ public class ReceiverSocket extends Receiver{
 		
 		return toReturn;	
 	}
-	
 
-	private String extractDatagramContent(DatagramPacket packet) {
-		setPeerAddress(packet.getAddress().getHostAddress());
-		return new String(packet.getData());
+	protected String getPacketAddress(Object packet) {
+		DatagramPacket dp = (DatagramPacket)packet;
+		return dp.getAddress().getHostAddress();
 	}
 	
-	private ArrayList<String> extractDatagramContent(ArrayList<DatagramPacket> packets) {
-		ArrayList<String> content = new ArrayList<String>(packets.size());
-		for (DatagramPacket packet : packets) {
-			content.add(extractDatagramContent(packet));
-		}
-		return content;
+	protected String getPacketContent(Object packet) {
+		DatagramPacket dp = (DatagramPacket)packet; 
+		return new String(dp.getData());
 	}
 	
 	@Override
@@ -121,7 +117,7 @@ public class ReceiverSocket extends Receiver{
 		//returns the content of all packages read in order.
 		try {
 			socket.setSoTimeout(0);
-			return extractDatagramContent(runSocket(packetsMax));
+			return extractDatagramContent(runSocket(packetsMax).toArray());
 		}
 		catch (Exception e) {
 			return null;
@@ -139,8 +135,7 @@ public class ReceiverSocket extends Receiver{
 	public  ArrayList<String> receiveData(int packetsMax, String code) {
 		try {
 			socket.setSoTimeout(0);
-			ArrayList<DatagramPacket> toReturn = runSocket(packetsMax, code);
-			return extractDatagramContent(toReturn);
+			return extractDatagramContent(runSocket(packetsMax, code).toArray());
 		}
 		catch (IOException e) {
 			return null;
@@ -152,7 +147,6 @@ public class ReceiverSocket extends Receiver{
 		try {
 			socket.setSoTimeout(timeout);
 			DatagramPacket packet = runSocket(1, code).get(0);
-			setPeerAddress(packet.getAddress().getHostAddress());
 			return extractDatagramContent(packet);
 		}
 		catch (Exception e) {
@@ -165,7 +159,6 @@ public class ReceiverSocket extends Receiver{
 		try {
 			socket.setSoTimeout(timeout);
 			DatagramPacket toReturn = runSocket(1, codes).get(0);
-			setPeerAddress(toReturn.getAddress().getHostAddress());
 			return extractDatagramContent(toReturn);
 		}
 		catch (Exception e) {
@@ -178,7 +171,7 @@ public class ReceiverSocket extends Receiver{
 		try {
 			socket.setSoTimeout(timeout);
 			ArrayList<DatagramPacket> toReturn = runSocket(packetsMax);
-			return extractDatagramContent(toReturn);
+			return extractDatagramContent(toReturn.toArray());
 		}
 		catch (Exception e) {
 			return null;
