@@ -15,8 +15,8 @@ public class Main {
 		int opt = scan.nextInt();
 		switch (opt) {
 			case 1:
-				App app = new App(new ReceiverSocket(), new SenderSocket());
-				app.run();
+				StandardUserInterface sui = new StandardUserInterface();
+				sui.run();
 				break;
 			case 2:
 				//IOT_IOTDevice iotDevice = new IOT_IOTDevice("Digivice");

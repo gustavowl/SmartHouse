@@ -17,10 +17,6 @@ public class App {
 		ui = new StandardUserInterface(this);
 	}
 	
-	public void run() {
-		ui.run();
-	}
-	
 	public void discoveryStart() {
 		/* Protocol outline:
 		 * 1 - Sends broadcast message in order to discover new devices
