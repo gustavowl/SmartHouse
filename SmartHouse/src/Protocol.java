@@ -65,19 +65,6 @@ public class Protocol {
 		}
 	}
 	
-	private static String buildIOTDeviceContent(Receiver receiver, String name) {
-		return receiver.getAddress() + "__" + name;
-	}
-	
-	private static IOTDevice extractIOTDeviceFromContent(String content) {
-		//port at datagram is sender. Receiver will be it - 1 (check constants)
-		String[] msg = new String[2];
-		int index = content.indexOf("__");
-		msg[0] = content.substring(0, index);
-		msg[1] = content.substring(index + 2);
-		return new AppIOTDevice(msg[0], msg[1]);
-	}
-	
 	public ArrayList<IOTDevice> getIotsFound() {
 		return iotsFound;
 	}
@@ -120,7 +107,7 @@ public class Protocol {
 				}
 				
 				if (!finished) {
-					IOTDevice iot = extractIOTDeviceFromContent(
+					IOTDevice iot = new AppIOTDevice(receiver.getPeerAddress(),
 							ProtocolMessage.getMessageContent(dataFromIoT));
 					synchronized (iotsFound) {
 						iotsFound.add(iot); //STEP 3
@@ -190,8 +177,8 @@ public class Protocol {
 			int attempts = 0; //FIXME: USE sendMessageAndWait
 			while (attempts <= 60) {
 				if (attempts < 60) {
-					sendMessage("CANICON_ID", buildIOTDeviceContent(receiver, iotId),
-							receiver.getPeerAddress(), Receiver.getServerPort(), sender);
+					sendMessage("CANICON_ID", iotId, receiver.getPeerAddress(),
+							Receiver.getServerPort(), sender);
 					
 					//STEP 3
 					String dataRecvd = receiver.receiveData("CONFRM_IOT", 1000);
