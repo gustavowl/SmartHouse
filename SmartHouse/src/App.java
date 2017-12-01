@@ -1,20 +1,19 @@
 import java.util.ArrayList;
-import java.util.regex.Pattern;
 
 public class App {
 	ArrayList<AppIOTDevice> connectedIots;
 	private ArrayList<AppIOTDevice> iotsDiscovered;
 	private ProtocolFacade protocol;
-	private ReceiverSocket receiver;
-	private SenderSocket sender;
+	private Receiver receiver;
+	private Sender sender;
 	private ThreadDiscoverer  td;
 	private UserInterface ui;
 	
-	public App() {
+	public App(Receiver receiver, Sender sender) {
 		connectedIots = new ArrayList<AppIOTDevice>();
 		protocol = new ProtocolFacade();
-		receiver = new ReceiverSocket();
-		sender = new SenderSocket();
+		this.receiver = receiver;
+		this.sender = sender;
 		ui = new StandardUserInterface(this);
 	}
 	

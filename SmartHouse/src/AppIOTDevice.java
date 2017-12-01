@@ -1,4 +1,3 @@
-import java.net.InetAddress;
 
 //IOTDevice representation as seen by the App
 public class AppIOTDevice extends IOTDevice {
@@ -9,12 +8,12 @@ public class AppIOTDevice extends IOTDevice {
 	}
 	
 	public AppIOTDevice(String name) {
-		this(null, 0, name);
+		this(null, name);
 		//creates local representation of IOT (local address)
 	}
 	
-	public AppIOTDevice(InetAddress address, int port, String name) {
-		super(address, port, name);
+	public AppIOTDevice(String address, String name) {
+		super(address, name);
 		
 	}
 	

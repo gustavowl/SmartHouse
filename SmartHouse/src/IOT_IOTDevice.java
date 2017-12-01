@@ -1,23 +1,21 @@
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.util.ArrayList;
 
 //IOTDevice representation as seen by the IOT itself
 public abstract class IOT_IOTDevice extends IOTDevice {
 	ReceiverSocket receiver;
-	SenderSocket sender;
+	Sender sender;
 	ProtocolFacade protocol;
 	
 	public IOT_IOTDevice() {
-		this(ProtocolFacade.getStandardIotReceiverPort(), "", null);
+		this("", null);
 	}
 	
 	public IOT_IOTDevice(String name) {
-		this(ProtocolFacade.getStandardIotReceiverPort(), name, null);
+		this(name, null);
 	}
 	
-	public IOT_IOTDevice(int port, String name, InetAddress peerAddress) {
-		super(null, port, name);
+	public IOT_IOTDevice(String name, String peerAddress) {
+		super(null, name);
 		receiver = new ReceiverSocket();
 		//listenerPort = port;
 		sender = new SenderSocket();
@@ -36,10 +34,10 @@ public abstract class IOT_IOTDevice extends IOTDevice {
 	
 	public void discover() {
 		while (true) {
-			InetSocketAddress isa = protocol.ServerDiscoveryStart(receiver,
+			String address = protocol.ServerDiscoveryStart(receiver,
 					sender, getName());
-			if (isa != null) {
-				setPeerAddress(isa.getAddress());
+			if (address != null) {
+				setPeerAddress(address);
 				break;
 			}
 			else {
@@ -60,7 +58,7 @@ public abstract class IOT_IOTDevice extends IOTDevice {
 		 * 6 - List consumption (?)
 		 */
 		while (peerAddress != null) {
-			byte[] message = protocol.listenToServerRequests(getPeerAddress(), receiver);
+			String message = protocol.listenToServerRequests(getPeerAddress(), receiver);
 			String code = ProtocolMessage.getMessageCode(message);
 			String content = "";
 			if (ProtocolFacade.isGetStatus(code)) {

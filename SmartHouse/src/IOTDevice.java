@@ -1,31 +1,32 @@
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.util.ArrayList;
 
 abstract public class IOTDevice {
-	protected InetAddress address;
+	protected String address;
+	//protected String port;
 	//protected int listenerPort;
-	protected InetAddress peerAddress;
+	protected String peerAddress;
+	//protected String peerPort;
 	//protected int peerPort;
 	//protected ArrayList<Method> methods;
 	protected String name;
 	
 	protected IOTDevice() {
-		this(null, 0, "");
+		this(null, "");
 	}
 	
 	protected IOTDevice(String name) {
-		this(null, 0, name);
+		this(null, name);
 	}
 	
-	protected IOTDevice(InetAddress address, int listenerPort, String name) {
+	protected IOTDevice(String address, String name) {
+		this.address = address;
+		/*
 		if (address != null) {
 			this.address = address;
 		}
 		else {
 			InetSocketAddress isa = new InetSocketAddress("0.0.0.0", 0);
 			this.address = isa.getAddress();
-		}
+		}*/
 		//this.listenerPort = listenerPort;
 		this.name = name;
 		this.peerAddress = null;
@@ -35,7 +36,7 @@ abstract public class IOTDevice {
 		methods.add(new Method("remove"));*/
 	}
 	
-	public void setPeerAddress(InetAddress peerAddress) {
+	public void setPeerAddress(String peerAddress) {
 		this.peerAddress = peerAddress;
 	}
 	
@@ -44,7 +45,7 @@ abstract public class IOTDevice {
 		this.peerPort = peerPort;
 	}*/
 	
-	public InetAddress getAddress() {
+	public String getAddress() {
 		return address;
 	}
 	
@@ -52,7 +53,7 @@ abstract public class IOTDevice {
 		return listenerPort;
 	}*/
 	
-	public InetAddress getPeerAddress() {
+	public String getPeerAddress() {
 		return peerAddress;
 	}
 	

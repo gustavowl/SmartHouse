@@ -5,25 +5,36 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 
-public class ReceiverSocket {
+import javax.swing.plaf.basic.BasicTreeUI.SelectionModelPropertyChangeHandler;
+
+public class ReceiverSocket extends Receiver{
 	private DatagramSocket socket;
 	
 	ReceiverSocket() {
+		super();
 		socket = null;
+		setServerPort("12112");
+		setIotPort("12114");
 	}
 	
 	public void close() {
 		if (socket != null && !socket.isClosed()) {
 			socket.close();
+			setAddress(null);
+			setPort(null);
 		}
 	}
 	
-	public void open(int port, boolean isBroadcast) {
+	public void open(String port, boolean isBroadcast) {
 		if (socket == null || socket.isClosed()) {
 			//TODO: verify if port range is valid
 			try {
 				socket = new DatagramSocket(null);
-				socket.bind(new InetSocketAddress(InetAddress.getByName("0.0.0.0"), port));
+				InetSocketAddress isa = new InetSocketAddress(InetAddress.getByName("0.0.0.0"), 
+						Integer.parseInt(port));
+				setAddress(isa.getAddress().getHostAddress());
+				setPort(String.valueOf(isa.getPort()));
+				socket.bind(isa);
 				socket.setBroadcast(isBroadcast);
 			}
 			catch (IOException ex) {
@@ -60,8 +71,8 @@ public class ReceiverSocket {
 		do {
 			ArrayList<DatagramPacket> packetsRcvd = runSocket(packetsMax);
 			for (DatagramPacket packetMsg : packetsRcvd) {
-				String temp = ProtocolMessage.getMessageCode(packetMsg.getData()).trim(); //FIXME: DELETE
-				if (ProtocolMessage.getMessageCode(packetMsg.getData()).trim().equals(code.trim())) {
+				String msgStr = new String(packetMsg.getData());
+				if (ProtocolMessage.getMessageCode(msgStr).trim().equals(code.trim())) {
 					toReturn.add(packetMsg);
 				}
 			}
@@ -69,6 +80,7 @@ public class ReceiverSocket {
 		
 		return toReturn;	
 	}
+	
 	
 	//returns packages received with one of the given codes
 	//e.g. DISCVR_IOT, CONFRM_IOT, and CANICON_ID
@@ -78,7 +90,8 @@ public class ReceiverSocket {
 		do {
 			ArrayList<DatagramPacket> packetsRcvd = runSocket(packetsMax);
 			for (DatagramPacket packetMsg : packetsRcvd) {
-				String msgReceived = ProtocolMessage.getMessageCode(packetMsg.getData()).trim();
+				String packetMsgStr = new String(packetMsg.getData());
+				String msgReceived = ProtocolMessage.getMessageCode(packetMsgStr).trim();
 				for (int i = 0; i < codes.length; i++) {
 					if (msgReceived.equals(codes[i])) {
 						toReturn.add(packetMsg);
@@ -91,61 +104,92 @@ public class ReceiverSocket {
 		return toReturn;	
 	}
 	
-	ArrayList<DatagramPacket> receiveData(int packetsMax) {
+
+	private String extractDatagramContent(DatagramPacket packet) {
+		setPeerAddress(packet.getAddress().getHostAddress());
+		return new String(packet.getData());
+	}
+	
+	private ArrayList<String> extractDatagramContent(ArrayList<DatagramPacket> packets) {
+		ArrayList<String> content = new ArrayList<String>(packets.size());
+		for (DatagramPacket packet : packets) {
+			content.add(extractDatagramContent(packet));
+		}
+		return content;
+	}
+	
+	@Override
+	public	ArrayList<String> receiveData(int packetsMax) {
 		//returns the content of all packages read in order.
 		try {
 			socket.setSoTimeout(0);
-			return runSocket(packetsMax);
+			return extractDatagramContent(runSocket(packetsMax));
 		}
 		catch (Exception e) {
 			return null;
 		}
 	}
 	
+	public String receiveData(String code) {
+		return receiveData(1, code).get(0);
+	}
+	
 	//returns packages received with a given code
 	//e.g. DISCVR_IOT, CONFRM_IOT, and CANICON_ID
 	//TODO: create struct or class for codes
-	ArrayList<DatagramPacket> receiveData(int packetsMax, String code) {
+	@Override
+	public  ArrayList<String> receiveData(int packetsMax, String code) {
 		try {
 			socket.setSoTimeout(0);
 			ArrayList<DatagramPacket> toReturn = runSocket(packetsMax, code);
-			return toReturn;
+			return extractDatagramContent(toReturn);
 		}
 		catch (IOException e) {
 			return null;
 		}
 	}
 	
-	DatagramPacket receiveData(String code, int timeout) {
+	@Override
+	public String receiveData(String code, int timeout) {
 		try {
 			socket.setSoTimeout(timeout);
-			ArrayList<DatagramPacket> toReturn = runSocket(1, code);
-			return toReturn.get(0);
+			DatagramPacket packet = runSocket(1, code).get(0);
+			setPeerAddress(packet.getAddress().getHostAddress());
+			return extractDatagramContent(packet);
 		}
 		catch (Exception e) {
 			return null;
 		}
 	}
 	
-	DatagramPacket receiveData(final String[] codes, int timeout) {
+	@Override
+	public String receiveData(final String[] codes, int timeout) {
 		try {
 			socket.setSoTimeout(timeout);
-			ArrayList<DatagramPacket> toReturn = runSocket(1, codes);
-			return toReturn.get(0);
+			DatagramPacket toReturn = runSocket(1, codes).get(0);
+			setPeerAddress(toReturn.getAddress().getHostAddress());
+			return extractDatagramContent(toReturn);
 		}
 		catch (Exception e) {
 			return null;
 		}
 	}
 	
-	ArrayList<DatagramPacket> receiveData(int packetsMax, int timeout) {
+	@Override
+	public ArrayList<String> receiveData(int packetsMax, int timeout) {
 		try {
 			socket.setSoTimeout(timeout);
 			ArrayList<DatagramPacket> toReturn = runSocket(packetsMax);
-			return toReturn;
+			return extractDatagramContent(toReturn);
 		}
 		catch (Exception e) {
 			return null;
 		}
+	}
+
+	
+	@Override
+	public boolean isClosed() {
+		return socket.isClosed();
 	}
 }

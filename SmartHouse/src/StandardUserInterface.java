@@ -5,8 +5,7 @@ public class StandardUserInterface extends UserInterface {
 	private Scanner scan;
 	
 	public StandardUserInterface() {
-		super();
-		scan = new Scanner(System.in);
+		this(new App(new ReceiverSocket(), new SenderSocket()));
 	}
 	
 	public StandardUserInterface(App app) {

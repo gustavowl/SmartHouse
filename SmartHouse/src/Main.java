@@ -15,7 +15,7 @@ public class Main {
 		int opt = scan.nextInt();
 		switch (opt) {
 			case 1:
-				App app = new App();
+				App app = new App(new ReceiverSocket(), new SenderSocket());
 				app.run();
 				break;
 			case 2:

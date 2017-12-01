@@ -4,27 +4,33 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.SocketException;
 
-public class SenderSocket {
+public class SenderSocket extends Sender {
 	private DatagramSocket socket;
 	
 	SenderSocket() {
+		super();
+		setServerPort("12113");
+		setIotPort("12115");
 		socket = null;
 	}
 	
 	public void close() {
 		if (socket != null && !socket.isClosed()) {
 			socket.close();
+			setAddress(null);
 		}
 	}
 	
-	public void open(int port, boolean isBroadcast) {
+	public void open(String port, boolean isBroadcast) {
 		if (socket == null || socket.isClosed()) {
 			//TODO: verify if port range is valid
 			try {
 				socket = new DatagramSocket(null);
-				socket.bind(new InetSocketAddress(InetAddress.getByName("0.0.0.0"), port));
+				InetSocketAddress isa = new InetSocketAddress(InetAddress.getByName("0.0.0.0"), 
+						Integer.parseInt(port));
+				socket.bind(isa);
+				setAddress(isa.getAddress().getHostAddress());
 				socket.setBroadcast(isBroadcast);
 			}
 			catch (IOException ex) {
@@ -37,20 +43,21 @@ public class SenderSocket {
 		}
 	}
 	
-	void sendData(byte[] content) {
-		sendData(content, "255.255.255.255", 12112);
+	public void sendData(String content) {
+		sendData(content, "255.255.255.255", "12112");
 	}
 	
-	void sendData(byte[] content, int port) {
+	public void sendData(String content, String port) {
 		//TODO: check content size before sending
 		sendData(content, "255.255.255.255", port);
 	}
 
-	void sendData(byte[] content, String address, int port) {
+	public void sendData(String content, String address, String port) {
 		//TODO: check content size before sending
 		try {
-			DatagramPacket dp = new DatagramPacket(content, content.length, 
-					InetAddress.getByName(address), port);
+			byte[] contentByte = content.getBytes();
+			DatagramPacket dp = new DatagramPacket(contentByte, contentByte.length, 
+					InetAddress.getByName(address), Integer.parseInt(port));
 			socket.send(dp);
 			//FIXME: Delete next line
 			//System.out.println("Message sent to " + address + ':' + Integer.toString(port));

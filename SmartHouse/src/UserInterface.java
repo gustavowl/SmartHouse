@@ -1,4 +1,3 @@
-import java.util.ArrayList;
 import java.util.regex.Pattern;
 
 
@@ -7,10 +6,6 @@ public abstract class UserInterface {
 	protected App app;
 	protected int validOptionMin;
 	protected int validOptionMax;
-	
-	public UserInterface() {
-		this(new App());
-	}
 	
 	public UserInterface(App app) {
 		this.app = app;
