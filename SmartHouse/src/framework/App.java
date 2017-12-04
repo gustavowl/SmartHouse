@@ -116,7 +116,7 @@ public class App {
 		}
 	}
 	
-	public String executeIotSpecificFunctionality(int iotIndex, String functionality) {
+	public String executeIotSpecificFunctionality(int iotIndex, String functionality, String[] args) {
 		/*String[] iotFunctionalities = iotFunctionalitiesStr.split(
 				Pattern.quote(ProtocolMessage.getSeparator()));
 		

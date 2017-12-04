@@ -156,12 +156,7 @@ public abstract class UserInterface {
 				String[] iotFunctionalities = message.toString().split(
 						Pattern.quote(ProtocolMessage.getSeparator()));
 				
-				opt = listIotSpecificFunctionalities(iotFunctionalities);
-				
-				if (opt != -1) {
-					showMessage(app.executeIotSpecificFunctionality(
-							iotIndex, iotFunctionalities[opt]));
-				}
+				listIotSpecificFunctionalities(iotFunctionalities, iotIndex);
 			}
 			else {
 				showMessage(message.toString());
@@ -178,17 +173,28 @@ public abstract class UserInterface {
 	
 	//Returns the index of selected specific functionality.
 	//Returns -1 if the option selected was not a functionality (i.e. UI inner option)
-	public int listIotSpecificFunctionalities(String[] functionalities) {
+	public void listIotSpecificFunctionalities(String[] functionalities, int funcIndex) {
 		showIotSpecificFunctionalities(functionalities);
 		
 		int opt = readOptionUntilValid();
 		opt = executeListIotSpecificFunctionality(opt);
 		
+		if (opt != -1) {
+			String str = functionalities[opt];
+			str = str.substring(str.indexOf('(') + 1, str.indexOf(')'));
+			String[] argsDescription = str.split(",");
+			String[] args = readArgs(argsDescription);
+			
+			showMessage(app.executeIotSpecificFunctionality(
+					funcIndex, functionalities[opt], args));
+		}
+		
 		setOptionRangeInvalid();
-		return opt;
 	}
 	
 	protected abstract void showIotSpecificFunctionalities(String[] functionalities);
 	
 	protected abstract int executeListIotSpecificFunctionality(int option);
+	
+	protected abstract String[] readArgs(String[] argsDescription);
 }

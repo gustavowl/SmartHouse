@@ -128,4 +128,10 @@ public class StandardUserInterface extends UserInterface {
 	protected int executeListIotSpecificFunctionality(int option) {
 		return option - 1;
 	}
+
+	@Override
+	protected String[] readArgs(String[] argsDescription) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
