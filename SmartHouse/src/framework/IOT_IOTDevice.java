@@ -1,8 +1,9 @@
+package framework;
 import java.util.ArrayList;
 
 //IOTDevice representation as seen by the IOT itself
 public abstract class IOT_IOTDevice extends IOTDevice {
-	ReceiverSocket receiver;
+	Receiver receiver;
 	Sender sender;
 	ProtocolFacade protocol;
 	
@@ -16,9 +17,9 @@ public abstract class IOT_IOTDevice extends IOTDevice {
 	
 	public IOT_IOTDevice(String name, String peerAddress) {
 		super(null, name);
-		receiver = new ReceiverSocket();
+		receiver = initReceiver();
 		//listenerPort = port;
-		sender = new SenderSocket();
+		sender = initSender();
 		setPeerAddress(peerAddress);
 		//setPeerPort(peerPort);
 		protocol = new ProtocolFacade();
@@ -90,6 +91,10 @@ public abstract class IOT_IOTDevice extends IOTDevice {
 			listenToPeer();
 		}
 	}
+	
+	protected abstract Receiver initReceiver();
+	
+	protected abstract Sender initSender();
 	
 	public abstract ArrayList<String> getFacadeMethods();
 	

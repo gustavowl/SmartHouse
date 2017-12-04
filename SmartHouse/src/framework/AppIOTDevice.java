@@ -1,3 +1,4 @@
+package framework;
 
 //IOTDevice representation as seen by the App
 public class AppIOTDevice extends IOTDevice {

@@ -1,3 +1,4 @@
+package framework;
 
 public abstract class Sender {
 	
@@ -5,7 +6,7 @@ public abstract class Sender {
 	private static String IOT_SENDER_PORT;
 	private String address;
 	
-	Sender() {
+	protected Sender() {
 	}
 	
 	public abstract void close();

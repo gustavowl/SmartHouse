@@ -1,9 +1,11 @@
+package instance1;
 //import java.net.DatagramPacket;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import framework.*;
 
 public class SenderSocket extends Sender {
 	private DatagramSocket socket;

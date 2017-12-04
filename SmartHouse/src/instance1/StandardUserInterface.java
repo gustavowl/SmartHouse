@@ -1,4 +1,6 @@
+package instance1;
 import java.util.Scanner;
+import framework.*;
 
 public class StandardUserInterface extends UserInterface {
 

@@ -1,3 +1,4 @@
+package framework;
 
 abstract public class IOTDevice {
 	protected String address;

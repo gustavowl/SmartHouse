@@ -1,3 +1,4 @@
+package framework;
 import java.util.ArrayList;
 
 public abstract class Receiver {
@@ -8,7 +9,7 @@ public abstract class Receiver {
 	private String peerAddress;
 	private String port;
 	
-	Receiver() {
+	protected Receiver() {
 	}
 	
 	public abstract void close();

@@ -1,11 +1,13 @@
+package instance1;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
+import framework.*;
 
-public class ReceiverSocket extends Receiver{
+public class ReceiverSocket extends Receiver {
 	private DatagramSocket socket;
 	
 	ReceiverSocket() {

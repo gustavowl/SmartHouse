@@ -1,26 +1,30 @@
+package instance1;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import framework.*;
 
-public class Digivice extends IOT_IOTDevice {
+public class Lamp extends IOT_IOTDevice {
 	
-	private int form;
-	private String[] evolutions;
+	private boolean isLampOn;
 	Method[] facadeMethods;
 	
-	public Digivice() {
-		super("Digivice");
+	public Lamp() {
+		this("Lamp");
+	}
+	
+	public Lamp(String name) {
+		super(name);
+		isLampOn = false;
 		
-		form = 0;
-		evolutions = new String[]{"Agumon", "Greymon", "MetalGreymon", "WarGreymon"};
-		
-		Class<? extends Digivice> c = this.getClass();
+		Class<? extends Object> c = this.getClass();
 		facadeMethods = c.getDeclaredMethods();
 		ArrayList<Method> methods = new ArrayList<Method>();
 		for (Method method : c.getDeclaredMethods()) {
 			String str = method.getName();
 			if (method.toString().indexOf("private") != 0 && !str.equals("getFacadeMethods") &&
-					!str.equals("executeFacadeMethod")  && !str.equals("getIotStatus")) {
-				
+					!str.equals("executeFacadeMethod") && !str.equals("getIotStatus") &&
+					!str.equals("initReceiver") && !str.equals("initSender")) {
+
 				methods.add(method);
 			}
 		}
@@ -62,30 +66,35 @@ public class Digivice extends IOT_IOTDevice {
 		return null;
 	}
 	
-	public void showActualForm() {
-		System.out.println("My actual form is: " + evolutions[form]);
+	public void turnOn() {
+		isLampOn = true;
+		System.out.println("Lamp is on");
 	}
 	
-	public void digivolve() {
-		if (form < evolutions.length - 1) {
-			System.out.println(evolutions[form] + " digivolves to " + evolutions[++form]);
-		}
-		else {
-			System.out.println("I'm already at my strongest form!");
-		}
+	public void turnOff() {
+		isLampOn = false;
+		System.out.println("Lamp is off");
 	}
 	
-	public void unDigivolve() {
-		if (form > 0) {
-			System.out.println(evolutions[form--] + " undigivolves back to " + evolutions[form]);
-		}
-		else {
-			System.out.println("I'm already at my weakest form!");
-		}
+	private boolean getLampState() {
+		return isLampOn;
 	}
 
 	@Override
 	public String getIotStatus() {
-		return "My current form is " + evolutions[form];
+		if (getLampState()) {
+			return "Lamp is ON";
+		}
+		return "Lamp is OFF";
+	}
+
+	@Override
+	public Receiver initReceiver() {
+		return new ReceiverSocket();
+	}
+
+	@Override
+	public Sender initSender() {
+		return new SenderSocket();
 	}
 }

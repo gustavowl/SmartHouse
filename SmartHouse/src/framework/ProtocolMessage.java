@@ -1,3 +1,4 @@
+package framework;
 
 public final class ProtocolMessage {
 	private static final String SEPARATOR = "|";
