@@ -76,7 +76,15 @@ public abstract class IOT_IOTDevice extends IOTDevice {
 			else if (ProtocolFacade.isRunDeviceFunctionality(code)) {
 				//run method
 				content = ProtocolMessage.getMessageContent(message);
-				this.executeFacadeMethod(content, new String[] {});
+				String signature = content;
+				String[] parameters = new String[0];
+				if (content.indexOf('(') > -1) {
+					signature = content.substring(0, content.indexOf('('));
+					content = content.substring(content.indexOf('(') + 1,
+							content.indexOf(')'));
+					parameters = content.split(",");
+				}
+				this.executeFacadeMethod(signature, parameters);
 				//run this
 			}
 		}

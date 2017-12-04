@@ -8,6 +8,7 @@ public class Digivice extends IOT_IOTDevice {
 	private int form;
 	private String[] evolutions;
 	Method[] facadeMethods;
+	String[] facadeParameters;
 	
 	public Digivice() {
 		super("Digivice");
@@ -17,41 +18,72 @@ public class Digivice extends IOT_IOTDevice {
 		
 		Class<? extends Digivice> c = this.getClass();
 		facadeMethods = c.getDeclaredMethods();
+		ArrayList<String> parameters = new ArrayList<String>();
 		ArrayList<Method> methods = new ArrayList<Method>();
 		for (Method method : c.getDeclaredMethods()) {
 			String str = method.getName();
 			if (method.toString().indexOf("private") != 0 && !str.equals("getFacadeMethods") &&
 					!str.equals("executeFacadeMethod")  && !str.equals("getIotStatus") &&
-					!str.equals("initReceiver") && !str.equals("initSender")) {
+					!str.equals("initReceiver") && !str.equals("initSender") &&
+					!str.equals("getFacadeMethodParameters")) {
 				
 				methods.add(method);
+				parameters.add(getFacadeMethodParameters(method));
 			}
 		}
 		facadeMethods = new Method[methods.size()];
 		facadeMethods = methods.toArray(facadeMethods);
+		
+		facadeParameters = new String[methods.size()];
+		facadeParameters = parameters.toArray(facadeParameters);
+		
+		
+	}
+	
+	public String getFacadeMethodParameters(Method method) {
+		switch (method.getName()) {
+			case "speak":
+				return "String speech";
+			default:
+				return "";
+		}
 	}
 
 	@Override
 	public ArrayList<String> getFacadeMethods() {
 		ArrayList<String> list = new ArrayList<String>();
+		int i = 0;
 		for (Method method : facadeMethods) {
-			list.add(method.getName());
+			list.add(method.getName() + '(' + facadeParameters[i] + ')');
+			i++;
 		}
 		return list;
 	}
 	
 	@Override
 	public void executeFacadeMethod(String methodSignature, String[] args) {
-		// TODO Auto-generated method stub
+		
 		Method method = getMethod(methodSignature);
+		
 		if (method != null) {
-			try {
-				method.invoke(this);
-			}
-			catch(Exception e) {
-				System.out.println("Error when trying to execute lamp facade method.\n" +
-						"\tSignature: " + methodSignature + "\n\tArgs: " + args.toString() +
-						"\t" + e.getMessage());
+			
+			if (method.getParameterCount() == args.length) {
+				
+				Object[] objArgs = new Object[args.length];
+				for (int i = 0; i < objArgs.length; i++) {
+					//does not work for primitive
+					objArgs[i] = (String)args[i];
+					System.out.println("IHUL" + objArgs[i].toString());
+				}
+				
+				try {
+					method.invoke(this, objArgs);
+				}
+				catch(Exception e) {
+					System.out.println("Error when trying to execute lamp facade method.\n" +
+							"\tSignature: " + methodSignature + "\n\tArgs: " + args.toString() +
+							"\t" + e.getMessage());
+				}
 			}
 		}
 	}
@@ -100,5 +132,9 @@ public class Digivice extends IOT_IOTDevice {
 	@Override
 	public Sender initSender() {
 		return new SenderSocket();
+	}
+	
+	public void speak(String str) {
+		System.out.println(str);
 	}
 }
