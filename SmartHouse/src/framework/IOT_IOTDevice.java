@@ -79,12 +79,14 @@ public abstract class IOT_IOTDevice extends IOTDevice {
 				String signature = content;
 				String[] parameters = new String[0];
 				if (content.indexOf('(') > -1) {
-					signature = content.substring(0, content.indexOf('('));
-					content = content.substring(content.indexOf('(') + 1,
-							content.indexOf(')'));
-					parameters = content.split(",");
+					signature = content.substring(0, content.indexOf(")(") + 1);
+					content = content.substring(content.indexOf(")(") + 2);
+					content = content.substring(0, content.indexOf(')'));
+					if (!content.equals("")) {
+						parameters = content.split(",");
+					}
+					this.executeFacadeMethod(signature, parameters);
 				}
-				this.executeFacadeMethod(signature, parameters);
 				//run this
 			}
 		}

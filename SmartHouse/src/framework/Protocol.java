@@ -387,14 +387,14 @@ public class Protocol {
 		return ProtocolMessage.createMessage("TIMEOUT", "");
 	}
 	
-	public static String serverRequestRunningIotFunctionality(String methodSignature, String iotAddress,
-			Receiver receiver, Sender sender) {
+	public static String serverRequestRunningIotFunctionality(String methodSignature, String args,
+			String iotAddress, Receiver receiver, Sender sender) {
 		
 		receiver.open(Receiver.getServerPort(), false);
 		sender.open(Sender.getServerPort(), false);
 		//RUN IOT ESPECIFIC FUNCTIONALITY | RUN IOT FUNCTIONALITY REQUEST RECEIVED
-		String result = sendMessageAndWait("RUNIOTFUNC", methodSignature, iotAddress, Receiver.getIotPort(),
-				60, sender, "IOTFUNCRCV", receiver);
+		String result = sendMessageAndWait("RUNIOTFUNC", methodSignature + args,
+				iotAddress, Receiver.getIotPort(), 60, sender, "IOTFUNCRCV", receiver);
 		receiver.close();
 		sender.close();
 		if (result != null) {

@@ -116,7 +116,7 @@ public class App {
 		}
 	}
 	
-	public String executeIotSpecificFunctionality(int iotIndex, String functionality, String[] args) {
+	public String executeIotSpecificFunctionality(int iotIndex, String functionality, String args) {
 		/*String[] iotFunctionalities = iotFunctionalitiesStr.split(
 				Pattern.quote(ProtocolMessage.getSeparator()));
 		
@@ -124,8 +124,8 @@ public class App {
 		if (opt != -1) {
 			ui.showMessage(ProtocolFacade.runSpecificIotFunctionality(connectedIots,
 					index, sender, receiver, iotFunctionalities[opt]));
-		}*/
+		}*/		
 		return ProtocolFacade.runSpecificIotFunctionality(connectedIots, 
-				iotIndex, sender, receiver, functionality);
+				iotIndex, sender, receiver, functionality, args);
 	}
 }

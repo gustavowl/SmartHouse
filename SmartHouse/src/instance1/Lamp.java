@@ -36,7 +36,7 @@ public class Lamp extends IOT_IOTDevice {
 	public ArrayList<String> getFacadeMethods() {
 		ArrayList<String> list = new ArrayList<String>();
 		for (Method method : facadeMethods) {
-			list.add(method.getName());
+			list.add(method.getName() + "()");
 		}
 		return list;
 	}
@@ -58,6 +58,9 @@ public class Lamp extends IOT_IOTDevice {
 	}
 	
 	private Method getMethod(String methodSignature) {
+		methodSignature = methodSignature.substring(0,
+				methodSignature.indexOf("()"));
+		
 		for (Method method : facadeMethods) {
 			if (methodSignature.equals(method.getName())) {
 				return method;

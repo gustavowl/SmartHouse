@@ -155,9 +155,9 @@ public class ProtocolFacade {
 	}
 	
 	public static String runSpecificIotFunctionality(ArrayList<AppIOTDevice> connectedIots, int iotIndex,
-			Sender sender, Receiver receiver, String methodSignature) {
+			Sender sender, Receiver receiver, String methodSignature, String args) {
 		
-		String msgByte = Protocol.serverRequestRunningIotFunctionality(methodSignature, 
+		String msgByte = Protocol.serverRequestRunningIotFunctionality(methodSignature, args,
 				connectedIots.get(iotIndex).getAddress(), receiver, sender);
 		
 		if (ProtocolMessage.getMessageCode(msgByte).equals("TIMEOUT")) {

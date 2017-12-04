@@ -131,7 +131,14 @@ public class StandardUserInterface extends UserInterface {
 
 	@Override
 	protected String[] readArgs(String[] argsDescription) {
-		// TODO Auto-generated method stub
-		return null;
+		String[] args = new String[argsDescription.length];
+		scan.nextLine();
+		for (int i = 0; i < argsDescription.length; i++) {
+			System.out.println("Please, enter \"" + argsDescription[i] + 
+					"\" value: ");
+			args[i] = scan.nextLine();
+		}
+		showMessage("Finished reading parameters");
+		return args;
 	}
 }

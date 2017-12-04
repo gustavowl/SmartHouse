@@ -182,11 +182,31 @@ public abstract class UserInterface {
 		if (opt != -1) {
 			String str = functionalities[opt];
 			str = str.substring(str.indexOf('(') + 1, str.indexOf(')'));
-			String[] argsDescription = str.split(",");
+			String[] argsDescription;
+			if (!str.equals("")) {
+				 argsDescription = str.split(",");
+			}
+			else {
+				argsDescription = new String[0];
+			}
+			
+			str = functionalities[opt];
+			str = str.substring(0, str.indexOf('('));
+			
 			String[] args = readArgs(argsDescription);
 			
-			showMessage(app.executeIotSpecificFunctionality(
-					funcIndex, functionalities[opt], args));
+			String str_args = "(";
+			int length_minus_one = args.length - 1;
+			if (length_minus_one >= 0) {
+				for (int i = 0; i < length_minus_one; i++) {
+					str_args += args[i] + ",";
+				}
+				str_args += args[length_minus_one];
+			}
+			str_args += ")";
+			
+			showMessage(app.executeIotSpecificFunctionality(funcIndex,
+					functionalities[opt], str_args));
 		}
 		
 		setOptionRangeInvalid();

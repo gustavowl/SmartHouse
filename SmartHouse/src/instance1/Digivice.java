@@ -36,16 +36,18 @@ public class Digivice extends IOT_IOTDevice {
 		
 		facadeParameters = new String[methods.size()];
 		facadeParameters = parameters.toArray(facadeParameters);
-		
-		
 	}
 	
 	public String getFacadeMethodParameters(Method method) {
 		switch (method.getName()) {
 			case "speak":
-				return "String speech";
+				String str = "(String speech";
+				if (method.getParameterCount() == 2) {
+					str += ",Integer times";
+				}
+				return str + ")";
 			default:
-				return "";
+				return "()";
 		}
 	}
 
@@ -54,7 +56,7 @@ public class Digivice extends IOT_IOTDevice {
 		ArrayList<String> list = new ArrayList<String>();
 		int i = 0;
 		for (Method method : facadeMethods) {
-			list.add(method.getName() + '(' + facadeParameters[i] + ')');
+			list.add(method.getName() + facadeParameters[i]);
 			i++;
 		}
 		return list;
@@ -69,11 +71,13 @@ public class Digivice extends IOT_IOTDevice {
 			
 			if (method.getParameterCount() == args.length) {
 				
+				//Class<?>[] paramTypes = method.getParameterTypes();				
 				Object[] objArgs = new Object[args.length];
+				
 				for (int i = 0; i < objArgs.length; i++) {
 					//does not work for primitive
-					objArgs[i] = (String)args[i];
-					System.out.println("IHUL" + objArgs[i].toString());
+					//objArgs[i] = paramTypes[i].cast( (Object)args[i] );
+					objArgs[i] = args[i];
 				}
 				
 				try {
@@ -89,8 +93,17 @@ public class Digivice extends IOT_IOTDevice {
 	}
 	
 	private Method getMethod(String methodSignature) {
-		for (Method method : facadeMethods) {
-			if (methodSignature.equals(method.getName())) {
+		Method method;
+		for (int i = 0; i < facadeMethods.length; i++) {
+			method = facadeMethods[i];
+			
+			/*System.out.println(methodSignature + " == " + method.getName() +
+					getFacadeMethodParameters(method) + 
+					methodSignature.equals(method.getName() +
+							getFacadeMethodParameters(method)));*/
+			
+			if (methodSignature.equals(method.getName() +
+					getFacadeMethodParameters(method))) {
 				return method;
 			}
 		}
@@ -135,6 +148,13 @@ public class Digivice extends IOT_IOTDevice {
 	}
 	
 	public void speak(String str) {
-		System.out.println(str);
+		System.out.println("\"" + evolutions[form] + "\" says: " + str);
+	}
+	
+	public void speak(String str, String times) {
+		int speak_times = Integer.parseInt(times); 
+		for (int i = 0; i < speak_times; i++) {
+			speak(str);
+		}
 	}
 }
