@@ -4,12 +4,12 @@ import java.util.regex.Pattern;
 
 public abstract class UserInterface {
 	
-	protected App app;
+	protected IotManager iotManager;
 	protected int validOptionMin;
 	protected int validOptionMax;
 	
-	public UserInterface(App app) {
-		this.app = app;
+	public UserInterface(IotManager iotManager) {
+		this.iotManager = iotManager;
 		setOptionRangeInvalid();
 	}
 	
@@ -73,7 +73,7 @@ public abstract class UserInterface {
 		 * 5 - Adds IoT to list of recognized devices
 		 */
 		showDiscoveryInitialOptions();
-		app.discoveryStart();
+		iotManager.discoveryStart();
 		ThreadWriter tw = new ThreadWriter("Writer");
 		tw.start();
 
@@ -81,7 +81,7 @@ public abstract class UserInterface {
 		opt = executeDiscoveryOption(opt);
 		
 		tw.interrupt();
-		app.discoveryFinish(opt);
+		iotManager.discoveryFinish(opt);
 		setOptionRangeInvalid();
 	}
 	
@@ -99,7 +99,7 @@ public abstract class UserInterface {
 	protected abstract int executeDiscoveryOption(int option);
 	
 	protected void listSelectedIots() {
-		showListSelectedIotsOptions(app.getConnectedIots());
+		showListSelectedIotsOptions(iotManager.getConnectedIots());
 		
 		int opt = readOptionUntilValid();
 		opt = executeListSelectedIotsOption(opt);
@@ -123,7 +123,7 @@ public abstract class UserInterface {
 			int i = 0;
 			//STEP 3
 			while (!finish) {
-				String name = app.getNewDiscoveredDevice(i);
+				String name = iotManager.getNewDiscoveredDevice(i);
 				if (name != null) {
 					showNewDiscoveredIot(name);
 					i++;
@@ -145,14 +145,14 @@ public abstract class UserInterface {
 	protected abstract int executeListSelectedIotsOption(int option);
 	
 	protected void listIotStandardFunctionalities(int iotIndex) {
-		showListIotStandardFunctionalities(app.listSelectIotOptions());
+		showListIotStandardFunctionalities(iotManager.listSelectIotOptions());
 		
 		int opt = readOptionUntilValid();
 		opt = executeListIotStandardFunctionalities(opt);
 		
 		if (opt != -1) {
 			StringBuilder message = new StringBuilder();
-			if (app.executeIotStandardFunctionality(iotIndex, opt, message)) {
+			if (iotManager.executeIotStandardFunctionality(iotIndex, opt, message)) {
 				String[] iotFunctionalities = message.toString().split(
 						Pattern.quote(ProtocolMessage.getSeparator()));
 				
@@ -205,7 +205,7 @@ public abstract class UserInterface {
 			}
 			str_args += ")";
 			
-			showMessage(app.executeIotSpecificFunctionality(funcIndex,
+			showMessage(iotManager.executeIotSpecificFunctionality(funcIndex,
 					functionalities[opt], str_args));
 		}
 		

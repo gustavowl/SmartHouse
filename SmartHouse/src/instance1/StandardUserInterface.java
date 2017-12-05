@@ -7,22 +7,22 @@ public class StandardUserInterface extends UserInterface {
 	private Scanner scan;
 	
 	public StandardUserInterface() {
-		this(new App(new ReceiverSocket(), new SenderSocket()));
+		this(new IotManager(new ReceiverSocket(), new SenderSocket()));
 	}
 	
-	public StandardUserInterface(App app) {
-		super(app);
+	public StandardUserInterface(IotManager iotManager) {
+		super(iotManager);
 		scan = new Scanner(System.in);
 	}
 	
 	@Override
 	protected void showInitialOptions() {
 		System.out.println("------------------------------------");
-		System.out.println("This is the Smart House app!");
+		System.out.println("This is the Smart House IoT Manager!");
 		System.out.println("Please, choose the desisred action:");
 		System.out.println("1 - Discover new IoTs");
 		System.out.println("2 - Select IoT");
-		System.out.println("3 - Quit app");
+		System.out.println("3 - Quit Smart House IoT Manager");
 		validOptionMin = 1;
 		validOptionMax = 3;
 	}

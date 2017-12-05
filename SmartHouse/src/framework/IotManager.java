@@ -1,7 +1,7 @@
 package framework;
 import java.util.ArrayList;
 
-public class App {
+public class IotManager {
 	ArrayList<AppIOTDevice> connectedIots;
 	private ArrayList<AppIOTDevice> iotsDiscovered;
 	private ProtocolFacade protocol;
@@ -9,7 +9,7 @@ public class App {
 	private Sender sender;
 	private ThreadDiscoverer  td;
 	
-	public App(Receiver receiver, Sender sender) {
+	public IotManager(Receiver receiver, Sender sender) {
 		connectedIots = new ArrayList<AppIOTDevice>();
 		protocol = new ProtocolFacade();
 		this.receiver = receiver;
