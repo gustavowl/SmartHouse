@@ -10,7 +10,7 @@ import framework.*;
 public class SenderSocket extends Sender {
 	private DatagramSocket socket;
 	
-	SenderSocket() {
+	public SenderSocket() {
 		super();
 		setServerPort("12113");
 		setIotPort("12115");

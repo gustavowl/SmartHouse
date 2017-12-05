@@ -4,38 +4,36 @@ public class Lamp extends Thread {
 	private volatile int red;
 	private volatile int green;
 	private volatile int blue;
+	
+	private volatile int shown_red;
+	private volatile int shown_green;
+	private volatile int shown_blue;
+	
 	private volatile boolean on;
+	private volatile boolean isStroboscope;
+	
 	private volatile int strob_time_ms;
 	
 	public Lamp() {
 		red = green = blue = 0;
-		on = false;
+		on = isStroboscope = false;
 		strob_time_ms = 0;
 	}
 
 	public int getRed() {
-		if (isOn()) {
-			return red;
-		}
-		return 0;
+		return red;
 	}
 	public void setRed(int red) {
 		this.red = red % 256;
 	}
 	public int getGreen() {
-		if (isOn()) {
-			return green;
-		}
-		return 0;
+		return green;
 	}
 	public void setGreen(int green) {
 		this.green = green % 256;
 	}
 	public int getBlue() {
-		if (isOn()) {
-			return blue;
-		}
-		return 0;
+		return blue;
 	}
 	public void setBlue(int blue) {
 		this.blue = blue % 256;
@@ -46,11 +44,11 @@ public class Lamp extends Thread {
 	public void setOn(boolean isOn) {
 		this.on = isOn;
 	}
-	public boolean isStroboscope() {
-		return strob_time_ms > 0;
+	public void setStroboscope(boolean stroboscope) {
+		this.isStroboscope = stroboscope;
 	}
-	public void setStroboscope(boolean isStroboscope) {
-		strob_time_ms = (isStroboscope) ? 100 : 0;
+	public boolean isStroboscope() {
+		return isStroboscope;
 	}
 	
 	public int getStrob_time_ms() {
@@ -63,30 +61,49 @@ public class Lamp extends Thread {
 		}
 	}
 	
+	private void lightOn() {
+		synchronized (this) {
+			shown_red = red;
+			shown_green = green;
+			shown_blue = blue;
+		}
+	}
+	
+	private void LightOff() {
+		synchronized (this) {
+			shown_red = shown_green = shown_blue = 0;
+		}
+	}
+	
 	@Override
 	public void run() {
-		int prev_red, prev_blue, prev_green, swift;
-		prev_red = prev_green = prev_blue = 0;
+		boolean flash = true;
+
 		while (true) {
-			if (on && isStroboscope()) {
-				swift = red;
-				red = prev_red;
-				prev_red = swift;
-				
-				swift = green;
-				green = prev_green;
-				prev_green = swift;
-				
-				swift = blue;
-				blue = prev_blue;
-				prev_blue = swift;
-				
-				try {
-					Thread.sleep(strob_time_ms);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+			if (on) {
+				if (isStroboscope()) {
+					if (flash) {
+						lightOn();
+					}
+					else {
+						LightOff();
+					}
+					
+					try {
+						Thread.sleep(strob_time_ms);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
+					flash = !flash;
 				}
+				else {
+					lightOn();
+				}
+			}
+			else {
+				LightOff();
 			}
 		}
 	}
@@ -94,5 +111,17 @@ public class Lamp extends Thread {
 	@Override
 	public void interrupt() {
 		super.interrupt();
+	}
+
+	public int getShownRed() {
+		return shown_red;
+	}
+
+	public int getShownGreen() {
+		return shown_green;
+	}
+
+	public int getShownBlue() {
+		return shown_blue;
 	}
 }

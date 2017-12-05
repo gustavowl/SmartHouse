@@ -10,7 +10,7 @@ import framework.*;
 public class ReceiverSocket extends Receiver {
 	private DatagramSocket socket;
 	
-	ReceiverSocket() {
+	public ReceiverSocket() {
 		super();
 		socket = null;
 		setServerPort("12112");

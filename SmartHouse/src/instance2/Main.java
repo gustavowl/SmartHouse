@@ -19,7 +19,7 @@ public class Main {
 				sui.run();
 				break;
 			case 2:
-				LampManager lm = new LampManager(1);
+				LampManager lm = new LampManager(2);
 				lm.run();
 				break;
 			default: 
