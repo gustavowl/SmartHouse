@@ -19,7 +19,7 @@ public class StandardUserInterface extends UserInterface {
 	protected void showInitialOptions() {
 		System.out.println("------------------------------------");
 		System.out.println("This is the Smart House IoT Manager!");
-		System.out.println("Please, choose the desisred action:");
+		System.out.println("Please, choose the desired action:");
 		System.out.println("1 - Discover new IoTs");
 		System.out.println("2 - Select IoT");
 		System.out.println("3 - Quit Smart House IoT Manager");
